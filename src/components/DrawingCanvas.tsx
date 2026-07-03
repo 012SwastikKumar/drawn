@@ -616,7 +616,7 @@ export default function DrawingCanvas({
           <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap border-t border-slate-200/60 pt-2">
             
             {/* Left: Swatches selection grid */}
-            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5" id="color-palette-selection">
+            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 px-2" id="color-palette-selection">
               {BRUSH_COLORS.map((color) => (
                 <button
                   key={color}

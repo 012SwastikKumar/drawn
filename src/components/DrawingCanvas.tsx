@@ -627,8 +627,10 @@ export default function DrawingCanvas({
                     }
                   }}
                   style={{ backgroundColor: color }}
-                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border border-slate-200 shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center ${
-                    currentColor === color ? 'ring-2 ring-brand-primary ring-offset-1 ring-offset-white scale-110 z-10' : 'hover:scale-105'
+                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center ${
+                    currentColor === color
+                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
+                      : 'border-slate-200 hover:scale-110 hover:shadow-2xs'
                   }`}
                   title={color === '#ffffff' ? 'Eraser Color' : `Color ${color}`}
                   aria-label={`Select ${color === '#ffffff' ? 'eraser' : `color ${color}`}`}
@@ -644,8 +646,10 @@ export default function DrawingCanvas({
               <div className="relative flex items-center justify-center shrink-0">
                 <button
                   onClick={() => document.getElementById('gradient-color-input')?.click()}
-                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border border-slate-200 transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
-                    !BRUSH_COLORS.includes(currentColor) ? 'ring-2 ring-brand-primary ring-offset-1 ring-offset-white scale-110 shadow-xs z-10' : 'shadow-3xs'
+                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
+                    !BRUSH_COLORS.includes(currentColor)
+                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
+                      : 'border-slate-200 shadow-3xs'
                   }`}
                   style={{
                     background: 'conic-gradient(from 180deg at 50% 50%, #ff0000 0deg, #ffff00 60deg, #00ff00 120deg, #00ffff 180deg, #0000ff 240deg, #ff00ff 300deg, #ff0000 360deg)'
@@ -757,10 +761,15 @@ export default function DrawingCanvas({
             </span>
             <div className="flex-1 overflow-y-auto space-y-1 scrollbar-none pr-0.5">
               {Object.values(players)
-                .sort((a, b) => b.score - a.score)
-                .map((p, idx) => {
+                .sort((a, b) => {
+                  if (b.score !== a.score) return b.score - a.score;
+                  return a.name.localeCompare(b.name);
+                })
+                .map((p) => {
                   const isSelf = p.id === playerId;
-                  const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+                  const higherScoringCount = Object.values(players).filter((other) => other.score > p.score).length;
+                  const rank = higherScoringCount + 1;
+                  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
                   return (
                     <div
                       key={p.id}
@@ -792,10 +801,15 @@ export default function DrawingCanvas({
             </span>
             <div className="flex items-center gap-1.5 min-w-0">
               {Object.values(players)
-                .sort((a, b) => b.score - a.score)
-                .map((p, idx) => {
+                .sort((a, b) => {
+                  if (b.score !== a.score) return b.score - a.score;
+                  return a.name.localeCompare(b.name);
+                })
+                .map((p) => {
                   const isSelf = p.id === playerId;
-                  const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+                  const higherScoringCount = Object.values(players).filter((other) => other.score > p.score).length;
+                  const rank = higherScoringCount + 1;
+                  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
                   return (
                     <div
                       key={p.id}

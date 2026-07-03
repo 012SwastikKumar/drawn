@@ -59,6 +59,7 @@ export default function AudioVideoRoom({
   // Keep peer connections in ref to survive re-renders
   const pcsRef = useRef<Record<string, RTCPeerConnection>>({});
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
+  const pendingSignalsRef = useRef<Array<{ senderId: string; signal: any }>>([]);
 
   // Initialize Local Media Stream
   useEffect(() => {
@@ -98,6 +99,7 @@ export default function AudioVideoRoom({
           setIsVideoOff(true);
           setIsMuted(true);
           updateMediaStatus(false, false);
+          setLocalStream(new MediaStream()); // Let WebRTC signaling progress as a receiver
         }
       }
     }
@@ -252,14 +254,16 @@ export default function AudioVideoRoom({
     makeCalls();
   }, [localStream, existingPlayerIds]);
 
-  // Handle incoming WebRTC signals forwarded by the server (only when local stream is ready)
-  useEffect(() => {
-    if (!localStream || !lastWebRtcSignal) return;
+  // Process all queued incoming WebRTC signals once local stream is ready
+  const processPendingSignals = async () => {
+    if (!localStream) return;
+    const queue = [...pendingSignalsRef.current];
+    pendingSignalsRef.current = [];
 
-    const { senderId, signal } = lastWebRtcSignal;
-    if (senderId === playerId) return;
+    for (const item of queue) {
+      const { senderId, signal } = item;
+      if (senderId === playerId) continue;
 
-    async function processSignal() {
       try {
         if (signal.type === 'offer') {
           // Proactively close and remove any existing stale peer connection for this sender (e.g. on reload/reconnect)
@@ -341,9 +345,21 @@ export default function AudioVideoRoom({
         console.error(`Error processing WebRTC signal from peer ${senderId}:`, err);
       }
     }
+  };
 
-    processSignal();
-  }, [localStream, lastWebRtcSignal]);
+  // Queue incoming signaling messages forwarded by the server
+  useEffect(() => {
+    if (!lastWebRtcSignal) return;
+    pendingSignalsRef.current.push(lastWebRtcSignal);
+    processPendingSignals();
+  }, [lastWebRtcSignal]);
+
+  // Drain pending signal queue as soon as local media stream is ready
+  useEffect(() => {
+    if (localStream) {
+      processPendingSignals();
+    }
+  }, [localStream]);
 
   // Clean up disconnected player's WebRTC channels
   useEffect(() => {
@@ -427,14 +443,21 @@ export default function AudioVideoRoom({
         </div>
 
         {Object.values(players)
-          .sort((a, b) => b.score - a.score)
-          .map((player, index) => {
+          .sort((a, b) => {
+            if (b.score !== a.score) {
+              return b.score - a.score;
+            }
+            return a.name.localeCompare(b.name);
+          })
+          .map((player) => {
             const isSelf = player.id === playerId;
             const remoteStream = remoteStreams[player.id];
             const showVideo = isSelf ? !isVideoOff : player.hasCamera && remoteStream;
 
-            // Medals for top 3
-            const rankBadge = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+            // Compute true rank based on competition ranking (ties get the same rank)
+            const higherScoringCount = Object.values(players).filter((p) => p.score > player.score).length;
+            const rank = higherScoringCount + 1;
+            const rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
 
             // Border & Glow settings depending on active game states
             let cardClasses = "relative w-36 h-24 sm:w-44 sm:h-30 flex-shrink-0 bg-slate-950 border rounded-xl sm:rounded-2xl overflow-hidden shadow-sm transition-all duration-300 cursor-default flex-none ";

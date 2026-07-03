@@ -1310,7 +1310,7 @@ export default function App() {
                 setActiveMobileTab('canvas');
                 if (soundEnabled) SoundEffects.playSelect();
               }}
-              className={`flex-1 flex flex-col items-center justify-center py-1.5 rounded-xl transition-all cursor-pointer ${
+              className={`flex-1 flex flex-col items-center justify-center py-1.5 rounded-xl transition-all cursor-pointer relative ${
                 activeMobileTab === 'canvas'
                   ? 'bg-indigo-600 text-white shadow-sm font-black'
                   : 'text-slate-500 hover:bg-slate-50 font-bold'
@@ -1318,6 +1318,9 @@ export default function App() {
             >
               <Palette className="w-5 h-5 mb-0.5" />
               <span className="text-[9px] uppercase tracking-wider">Canvas</span>
+              {isMyTurnToDraw && activeMobileTab !== 'canvas' && (
+                <span className="absolute top-1.5 right-6 w-2.5 h-2.5 rounded-full bg-red-500 border border-white animate-pulse" />
+              )}
             </button>
             
             <button

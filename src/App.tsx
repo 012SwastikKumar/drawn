@@ -1238,11 +1238,11 @@ export default function App() {
               </div>
 
               {/* DESKTOP/TABLET ONLY: Integrated Chat Sidebar Leaderboard (Always visible on laptop/tablet viewports) */}
-              <div className="hidden sm:block bg-slate-50 border-b border-slate-200/80 p-2.5 select-none" id="chat-sidebar-leaderboard">
-                <span className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+              <div className="hidden sm:block bg-slate-50 border-b border-slate-200/80 p-3 select-none" id="chat-sidebar-leaderboard">
+                <span className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">
                   Live Rankings
                 </span>
-                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+                <div className="space-y-1.5 max-h-48 overflow-y-auto scrollbar-thin pr-1">
                   {(Object.values(room.players) as Player[])
                     .sort((a, b) => {
                       if (b.score !== a.score) return b.score - a.score;
@@ -1256,14 +1256,19 @@ export default function App() {
                       return (
                         <div
                           key={p.id}
-                          className={`flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[9px] border shrink-0 ${
-                            isSelf ? 'bg-indigo-50 border-indigo-200 font-extrabold' : 'bg-white border-slate-200'
-                          } ${p.disconnected ? 'opacity-55' : ''}`}
+                          className={`flex items-center justify-between p-2 rounded-xl text-xs border transition-all ${
+                            isSelf
+                              ? 'bg-indigo-50/65 border-indigo-200 font-extrabold shadow-3xs'
+                              : 'bg-white border-slate-200/85 hover:bg-slate-50/50'
+                          } ${p.disconnected ? 'opacity-50' : ''}`}
                         >
-                          <span>{medal}</span>
-                          <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
-                          <span className="truncate max-w-[50px] uppercase tracking-wide leading-none">{p.name}</span>
-                          <span className="font-mono font-black text-indigo-650 leading-none">{p.score}</span>
+                          <div className="flex items-center gap-2 truncate max-w-[75%]">
+                            <span className="font-extrabold text-[11px] leading-none shrink-0 w-5 text-center">{medal}</span>
+                            <span className="w-2.5 h-2.5 rounded-full shrink-0 shadow-3xs border border-white/20" style={{ backgroundColor: p.color }} />
+                            <span className="truncate uppercase tracking-wide text-slate-700 text-[10.5px] leading-none">{p.name}</span>
+                            {isSelf && <span className="text-[7.5px] bg-indigo-600 text-white font-black px-1 py-px rounded-sm uppercase tracking-wider scale-90 shrink-0">You</span>}
+                          </div>
+                          <span className="font-mono font-black text-indigo-650 text-[11px] shrink-0">{p.score} PTS</span>
                         </div>
                       );
                     })}

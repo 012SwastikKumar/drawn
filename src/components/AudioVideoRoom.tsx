@@ -252,9 +252,9 @@ export default function AudioVideoRoom({
     makeCalls();
   }, [localStream, existingPlayerIds]);
 
-  // Handle incoming WebRTC signals forwarded by the server
+  // Handle incoming WebRTC signals forwarded by the server (only when local stream is ready)
   useEffect(() => {
-    if (!lastWebRtcSignal) return;
+    if (!localStream || !lastWebRtcSignal) return;
 
     const { senderId, signal } = lastWebRtcSignal;
     if (senderId === playerId) return;
@@ -343,7 +343,7 @@ export default function AudioVideoRoom({
     }
 
     processSignal();
-  }, [lastWebRtcSignal]);
+  }, [localStream, lastWebRtcSignal]);
 
   // Clean up disconnected player's WebRTC channels
   useEffect(() => {

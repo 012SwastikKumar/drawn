@@ -1007,60 +1007,9 @@ export default function App() {
                       onClearCanvas={handleClearCanvas}
                       onUndoStroke={handleUndoStroke}
                       isPip={false}
+                      players={room.players}
+                      playerId={playerId}
                     />
-
-                    {/* Floating Live Leaderboard overlay for mobile/desktop drawer/guessers */}
-                    <div className="absolute top-2 right-2 z-20 flex flex-col items-end">
-                      <button
-                        onClick={() => setShowLiveLeaderboard(!showLiveLeaderboard)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-white text-[9px] font-black uppercase tracking-widest rounded-full border border-white/10 shadow-lg cursor-pointer active:scale-95 select-none transition-all"
-                        id="live-leaderboard-toggle-btn"
-                        title="Toggle Score Leaderboard"
-                      >
-                        <span>🏆</span>
-                        <span>LEADERBOARD</span>
-                      </button>
-                      
-                      {showLiveLeaderboard && (
-                        <div className="mt-1.5 w-48 bg-slate-950/90 backdrop-blur-lg border border-white/10 rounded-2xl p-3 shadow-2xl animate-fade-in text-white select-none">
-                          <div className="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
-                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">Live Rankings</span>
-                            <button
-                              onClick={() => setShowLiveLeaderboard(false)}
-                              className="text-[8px] font-black uppercase tracking-widest text-slate-500 hover:text-white cursor-pointer"
-                            >
-                              Close
-                            </button>
-                          </div>
-                          <div className="space-y-1.5 max-h-40 overflow-y-auto scrollbar-thin pr-1">
-                            {(Object.values(room.players) as Player[])
-                              .sort((a, b) => b.score - a.score)
-                              .map((p, idx) => {
-                                const isSelf = p.id === playerId;
-                                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
-                                return (
-                                  <div
-                                    key={p.id}
-                                    className={`flex items-center justify-between p-1.5 rounded-lg text-[10px] ${
-                                      isSelf ? 'bg-indigo-600/30 border border-indigo-500/30' : 'bg-white/5 border border-white/5'
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-1.5 truncate max-w-[70%]">
-                                      <span className="shrink-0">{medal}</span>
-                                      <span
-                                        className="w-2 h-2 rounded-full shrink-0"
-                                        style={{ backgroundColor: p.color }}
-                                      />
-                                      <span className="font-extrabold truncate uppercase tracking-wide">{p.name}</span>
-                                    </div>
-                                    <span className="font-mono font-black text-indigo-400 shrink-0">{p.score}</span>
-                                  </div>
-                                );
-                              })}
-                          </div>
-                        </div>
-                      )}
-                    </div>
                   </div>
                 </div>
               )}

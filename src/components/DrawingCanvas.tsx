@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Stroke, Point } from '../types.js';
+import { Stroke, Point, Player } from '../types.js';
 import { Trash2, RotateCcw, Paintbrush, Eraser, Minus, Square, Circle, PaintBucket } from 'lucide-react';
 
 interface DrawingCanvasProps {
@@ -9,6 +9,8 @@ interface DrawingCanvasProps {
   onClearCanvas: () => void;
   onUndoStroke: () => void;
   isPip?: boolean;
+  players?: Record<string, Player>;
+  playerId?: string;
 }
 
 const BRUSH_COLORS = [
@@ -148,6 +150,8 @@ export default function DrawingCanvas({
   onClearCanvas,
   onUndoStroke,
   isPip = false,
+  players,
+  playerId,
 }: DrawingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -162,6 +166,10 @@ export default function DrawingCanvas({
   const currentStrokeIdRef = useRef<string>('');
   const lastSentTimeRef = useRef<number>(0);
   const [dimensions, setDimensions] = useState({ width: 600, height: 450 });
+
+  // Define layout states to show the leaderboard dynamically in empty areas
+  const [showLeftLeaderboard, setShowLeftLeaderboard] = useState(false);
+  const [showBottomLeaderboard, setShowBottomLeaderboard] = useState(false);
 
   // Handle resizing using ResizeObserver for fluid, responsive dimensions with locked aspect ratio
   useEffect(() => {
@@ -191,6 +199,18 @@ export default function DrawingCanvas({
         targetHeight = Math.max(targetHeight, minH);
         
         setDimensions({ width: targetWidth, height: targetHeight });
+
+        // Calculate available empty space around the centered 4:3 canvas (only in normal view)
+        if (!isPip) {
+          const leftSpace = (containerWidth - targetWidth) / 2;
+          const bottomSpace = (containerHeight - targetHeight) / 2;
+
+          setShowLeftLeaderboard(leftSpace >= 150);
+          setShowBottomLeaderboard(leftSpace < 150 && bottomSpace >= 80);
+        } else {
+          setShowLeftLeaderboard(false);
+          setShowBottomLeaderboard(false);
+        }
       }
     });
 
@@ -726,6 +746,74 @@ export default function DrawingCanvas({
           <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/95 text-brand-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-100 shadow-drawn-md backdrop-blur-xs select-none pointer-events-none animate-pulse" id="canvas-guesser-badge">
             <Paintbrush className="w-3.5 h-3.5" />
             <span>Watching Drawer...</span>
+          </div>
+        )}
+
+        {/* Left Always-On Sidebar Leaderboard (Only shown if space permits) */}
+        {!isPip && players && showLeftLeaderboard && (
+          <div className="absolute left-3 top-3 bottom-3 w-32 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-xl p-2 shadow-drawn-sm flex flex-col z-20 animate-fade-in text-slate-800" id="canvas-left-leaderboard">
+            <span className="block text-[8px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-slate-100 pb-1 mb-1.5">
+              Rankings
+            </span>
+            <div className="flex-1 overflow-y-auto space-y-1 scrollbar-none pr-0.5">
+              {Object.values(players)
+                .sort((a, b) => b.score - a.score)
+                .map((p, idx) => {
+                  const isSelf = p.id === playerId;
+                  const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+                  return (
+                    <div
+                      key={p.id}
+                      className={`flex items-center justify-between p-1 rounded-lg text-[9px] border ${
+                        isSelf ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50/50 border-slate-150'
+                      } ${p.disconnected ? 'opacity-50' : ''}`}
+                    >
+                      <div className="flex items-center gap-1 truncate max-w-[70%]">
+                        <span className="shrink-0">{medal}</span>
+                        <span
+                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          style={{ backgroundColor: p.color }}
+                        />
+                        <span className="font-extrabold truncate uppercase tracking-wide leading-none">{p.name}</span>
+                      </div>
+                      <span className="font-mono font-black text-indigo-650 shrink-0">{p.score}</span>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
+        {/* Bottom Always-On Strip Leaderboard (Only shown if space permits) */}
+        {!isPip && players && showBottomLeaderboard && (
+          <div className="absolute bottom-2.5 left-2.5 right-2.5 h-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-xl p-1.5 shadow-drawn-sm flex items-center justify-start gap-1.5 z-20 animate-fade-in text-slate-800 overflow-x-auto scrollbar-none" id="canvas-bottom-leaderboard">
+            <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-200 pr-1.5 mr-0.5 shrink-0 leading-none">
+              Rankings
+            </span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              {Object.values(players)
+                .sort((a, b) => b.score - a.score)
+                .map((p, idx) => {
+                  const isSelf = p.id === playerId;
+                  const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+                  return (
+                    <div
+                      key={p.id}
+                      className={`flex items-center gap-1 px-1.5 py-0.5 rounded-lg text-[9px] border shrink-0 ${
+                        isSelf ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50/50 border-slate-150'
+                      } ${p.disconnected ? 'opacity-50' : ''}`}
+                    >
+                      <span>{medal}</span>
+                      <span
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ backgroundColor: p.color }}
+                      />
+                      <span className="font-extrabold uppercase tracking-wide max-w-[40px] truncate leading-none">{p.name}</span>
+                      <span className="font-mono font-black text-indigo-650 leading-none">{p.score}</span>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         )}
       </div>

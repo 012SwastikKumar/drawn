@@ -607,12 +607,11 @@ export default function DrawingCanvas({
             </div>
           </div>
 
-          {/* Group 3: Brush Sizes (S, M, L, XL style segmented picker) */}
+          {/* Group 3: Brush Sizes (Pointer pixel size segmented picker) */}
           <div className="flex items-center gap-1 shrink-0" id="brush-size-selection">
             {currentTool !== 'fill' ? (
               <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-0.5 gap-0.5" id="size-segmented-control">
-                {BRUSH_SIZES.map((size, idx) => {
-                  const sizeLabels = ['S', 'M', 'L', 'XL'];
+                {BRUSH_SIZES.map((size) => {
                   return (
                     <button
                       key={size.value}
@@ -622,10 +621,10 @@ export default function DrawingCanvas({
                           ? 'bg-brand-primary text-white shadow-xs'
                           : 'text-slate-500 hover:text-slate-800'
                       }`}
-                      aria-label={`Brush size ${size.value} points`}
-                      title={`Size ${size.value}pt (${sizeLabels[idx]})`}
+                      aria-label={`Brush size ${size.value} pixels`}
+                      title={`Size ${size.value}px`}
                     >
-                      {sizeLabels[idx]}
+                      {`${size.value}px`}
                     </button>
                   );
                 })}
@@ -635,11 +634,11 @@ export default function DrawingCanvas({
             )}
           </div>
 
-          {/* Group 4: Board Controls */}
-          <div className="flex items-center gap-1 shrink-0" id="canvas-actions-bar">
+          {/* Group 4: Board Controls (Spaced out with visible borders on mobile to prevent mistouches) */}
+          <div className="flex items-center gap-3 sm:gap-1.5 shrink-0" id="canvas-actions-bar">
             <button
               onClick={onUndoStroke}
-              className="p-1 sm:p-1.5 text-slate-400 hover:text-brand-primary hover:bg-slate-50 rounded-lg transition-all cursor-pointer"
+              className="p-2 sm:p-1.5 text-slate-500 hover:text-brand-primary hover:bg-slate-100/70 border border-slate-200/60 rounded-xl sm:rounded-lg transition-all cursor-pointer bg-white sm:border-0 sm:bg-transparent shadow-xs sm:shadow-none"
               title="Undo last stroke"
               aria-label="Undo last stroke"
             >
@@ -647,7 +646,7 @@ export default function DrawingCanvas({
             </button>
             <button
               onClick={onClearCanvas}
-              className="p-1 sm:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
+              className="p-2 sm:p-1.5 text-red-500 hover:text-red-650 hover:bg-red-50/50 border border-red-200/50 rounded-xl sm:rounded-lg transition-all cursor-pointer bg-white sm:border-0 sm:bg-transparent shadow-xs sm:shadow-none"
               title="Clear Board"
               aria-label="Clear drawing canvas"
             >

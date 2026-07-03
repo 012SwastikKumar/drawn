@@ -404,7 +404,12 @@ export default function AudioVideoRoom({
                 {showVideo ? (
                   isSelf ? (
                     <video
-                      ref={localVideoRef}
+                      ref={(el) => {
+                        localVideoRef.current = el;
+                        if (el && localStream && el.srcObject !== localStream) {
+                          el.srcObject = localStream;
+                        }
+                      }}
                       autoPlay
                       playsInline
                       muted

@@ -76,6 +76,14 @@ export default function App() {
   const [activeMobileTab, setActiveMobileTab] = useState<'canvas' | 'chats' | 'players'>('canvas');
   const [pipWidth, setPipWidth] = useState<number>(140);
   const [pipPos, setPipPos] = useState({ x: 16, y: 110 }); // Offsets from bottom-right
+  const [lastReadMessageCount, setLastReadMessageCount] = useState<number>(0);
+
+  // Clear unread messages notification dot when opening chats
+  useEffect(() => {
+    if (activeMobileTab === 'chats') {
+      setLastReadMessageCount(messages.length);
+    }
+  }, [messages.length, activeMobileTab]);
 
   const dragStartRef = useRef<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
   const resizeStartRef = useRef<{ startX: number; startWidth: number; startPosX: number; startPosY: number } | null>(null);
@@ -822,10 +830,10 @@ export default function App() {
               </button>
               <button
                 onClick={copyInviteLink}
-                className="hidden sm:inline-flex h-9 px-3 sm:px-4 bg-white hover:bg-slate-50 rounded-xl text-[10px] sm:text-xs font-bold border border-slate-200 text-slate-700 transition-all items-center justify-center gap-1.5 shadow-xs shrink-0"
+                className="inline-flex h-9 px-2.5 sm:px-4 bg-white hover:bg-slate-50 rounded-xl text-[10px] sm:text-xs font-bold border border-slate-200 text-slate-700 transition-all items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
                 title="Copy Shared Invite Link"
               >
-                {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-indigo-600" />}
+                {copiedLink ? <Check className="w-4 h-4 text-emerald-600 animate-pulse" /> : <Copy className="w-4 h-4 text-indigo-600" />}
                 <span className="hidden sm:inline">INVITE LINK</span>
               </button>
               <button
@@ -1310,7 +1318,7 @@ export default function App() {
             >
               <MessageSquare className="w-5 h-5 mb-0.5" />
               <span className="text-[9px] uppercase tracking-wider">Chats</span>
-              {messages.length > 0 && activeMobileTab !== 'chats' && (
+              {messages.length > lastReadMessageCount && activeMobileTab !== 'chats' && (
                 <span className="absolute top-1.5 right-6 w-2.5 h-2.5 rounded-full bg-red-500 border border-white animate-pulse" />
               )}
             </button>

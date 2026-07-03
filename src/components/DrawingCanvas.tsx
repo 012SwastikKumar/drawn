@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Stroke, Point, Player } from '../types.js';
-import { Trash2, RotateCcw, Paintbrush, Eraser, Minus, Square, Circle, PaintBucket, ArrowUpRight, Triangle, Star, Diamond } from 'lucide-react';
+import { Trash2, RotateCcw, Pencil, Eraser, Minus, Square, Circle, PaintBucket, ArrowUpRight, Triangle, Star, Diamond } from 'lucide-react';
 
 interface DrawingCanvasProps {
   isDrawer: boolean;
@@ -716,7 +716,7 @@ export default function DrawingCanvas({
                 title="Pencil / Freehand Brush"
                 aria-label="Brush tool"
               >
-                <Paintbrush className="w-5 h-5" />
+                <Pencil className="w-5 h-5" />
               </button>
               <button
                 onClick={() => {
@@ -924,7 +924,7 @@ export default function DrawingCanvas({
         {/* Guesser Mode Overlays */}
         {!isDrawer && !isPip && (
           <div className={`absolute left-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/95 text-brand-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-100 shadow-drawn-md backdrop-blur-xs select-none pointer-events-none animate-pulse ${showTopLeaderboard ? 'top-14' : 'top-3'}`} id="canvas-guesser-badge">
-            <Paintbrush className="w-3.5 h-3.5" />
+            <Pencil className="w-3.5 h-3.5" />
             <span>Watching Drawer...</span>
           </div>
         )}

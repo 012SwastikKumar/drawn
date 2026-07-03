@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Background squircle with rich dark navy -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="#0b112c" />
+  
+  <!-- Subtle inner gradient gloss overlay -->
+  <path d="M50 50C100 80 180 100 256 100C332 100 412 80 462 50" stroke="rgba(255,255,255,0.06)" stroke-width="14" fill="none" stroke-linecap="round" />
+  
+  <!-- Colorful artistic paint splatters surrounding the notebook -->
+  <!-- Left Green Splatter -->
+  <path d="M80 200 C75 180, 110 160, 115 190 C120 220, 90 230, 80 200" fill="#22c55e" opacity="0.9" />
+  <circle cx="65" cy="180" r="8" fill="#22c55e" />
+  <!-- Bottom Blue Paint Splash Arc -->
+  <path d="M140 430 Q256 460 372 430" stroke="#3b82f6" stroke-width="16" stroke-linecap="round" fill="none" />
+  <circle cx="110" cy="425" r="10" fill="#3b82f6" />
+  <circle cx="400" cy="415" r="9" fill="#3b82f6" />
+  <!-- Right Yellow Splatter -->
+  <path d="M420 260 C440 250, 440 290, 415 295 C390 300, 400 270, 420 260" fill="#f59e0b" />
+  <circle cx="445" cy="310" r="7" fill="#f59e0b" />
+  <!-- Pink Splatter Top Right -->
+  <circle cx="430" cy="150" r="12" fill="#ec4899" />
+  <path d="M430 150 Q450 130 460 155" stroke="#ec4899" stroke-width="8" stroke-linecap="round" fill="none" />
+
+  <!-- Cute Spiral Notebook Group -->
+  <g transform="translate(45, -5) rotate(-6 256 256)">
+    <!-- Notebook soft drop shadow -->
+    <rect x="125" y="145" width="230" height="260" rx="28" fill="#040612" opacity="0.4" />
+    
+    <!-- Notebook Outer border (Sticker style) -->
+    <rect x="115" y="135" width="240" height="270" rx="32" fill="#ffffff" stroke="#0b112c" stroke-width="10" stroke-linejoin="round" />
+    
+    <!-- Notebook Inner Sheet -->
+    <rect x="130" y="150" width="210" height="240" rx="20" fill="#f8fafc" />
+
+    <!-- Notebook horizontal ruled lines -->
+    <line x1="160" y1="210" x2="310" y2="210" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" />
+    <line x1="160" y1="250" x2="310" y2="250" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" />
+    <line x1="160" y1="290" x2="310" y2="290" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" />
+    <line x1="160" y1="330" x2="310" y2="330" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" />
+    <line x1="160" y1="370" x2="310" y2="370" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Metal Binding Spirals at the top -->
+    <!-- Loop 1 -->
+    <rect x="150" y="110" width="20" height="46" rx="10" fill="#64748b" stroke="#0b112c" stroke-width="6" />
+    <!-- Loop 2 -->
+    <rect x="205" y="110" width="20" height="46" rx="10" fill="#64748b" stroke="#0b112c" stroke-width="6" />
+    <!-- Loop 3 -->
+    <rect x="260" y="110" width="20" height="46" rx="10" fill="#64748b" stroke="#0b112c" stroke-width="6" />
+    <!-- Loop 4 -->
+    <rect x="315" y="110" width="20" height="46" rx="10" fill="#64748b" stroke="#0b112c" stroke-width="6" />
+
+    <!-- Cute Smiling Mascot Face -->
+    <!-- Eyes -->
+    <circle cx="195" cy="255" r="14" fill="#0b112c" />
+    <circle cx="275" cy="255" r="14" fill="#0b112c" />
+    <!-- Pupils / Eye highlights -->
+    <circle cx="191" cy="251" r="5" fill="#ffffff" />
+    <circle cx="271" cy="251" r="5" fill="#ffffff" />
+    
+    <!-- Cheerful big smiley mouth -->
+    <path d="M205 285 Q235 320 265 285" stroke="#0b112c" stroke-width="9" stroke-linecap="round" fill="none" />
+    
+    <!-- Soft pink blushing cheeks -->
+    <circle cx="165" cy="280" r="10" fill="#ec4899" opacity="0.45" />
+    <circle cx="305" cy="280" r="10" fill="#ec4899" opacity="0.45" />
+  </g>
+
+  <!-- Big Playful Yellow Pencil -->
+  <g transform="translate(265, 175) rotate(32)">
+    <!-- Pencil Drop Shadow -->
+    <path d="M-22 -100 L22 -100 L22 50 L0 100 L-22 50 Z" fill="#040612" opacity="0.25" transform="translate(14, 14)" />
+    
+    <!-- Pencil Body (Vibrant Yellow/Amber) -->
+    <path d="M-22 -100 L22 -100 L22 50 L-22 50 Z" fill="#f59e0b" stroke="#0b112c" stroke-width="9" stroke-linejoin="round" />
+    <!-- Highlight Stripe on body -->
+    <rect x="-9" y="-100" width="18" height="150" fill="#fbbf24" />
+    
+    <!-- Sharpened Wood Cone Tip -->
+    <path d="M-22 50 L22 50 L0 100 Z" fill="#fed7aa" stroke="#0b112c" stroke-width="9" stroke-linejoin="round" />
+    <!-- Graphite Lead Tip -->
+    <path d="M-9 80 L9 80 L0 100 Z" fill="#0b112c" />
+    
+    <!-- Silver Metal Ferrule Band -->
+    <rect x="-22" y="-115" width="44" height="20" fill="#94a3b8" stroke="#0b112c" stroke-width="9" stroke-linejoin="round" />
+    <line x1="-22" y1="-105" x2="22" y2="-105" stroke="#0b112c" stroke-width="4" />
+    
+    <!-- Pink Eraser Cap -->
+    <path d="M-22 -115 L22 -115 C22 -135 -22 -135 -22 -115 Z" fill="#f472b6" stroke="#0b112c" stroke-width="9" stroke-linejoin="round" />
+  </g>
+</svg>

@@ -1,0 +1,1 @@
+{"name":"Scribble Voice \u0026 Video Showdown","description":"A real-time multiplayer drawing and guessing game featuring integrated video and voice chat rooms, real-time stroke synchronization, and automated score tracking.","requestFramePermissions":["camera","microphone"],"majorCapabilities":["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]}

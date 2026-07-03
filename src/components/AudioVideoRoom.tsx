@@ -1,0 +1,516 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Player } from '../types.js';
+import { Video, VideoOff, Mic, MicOff, Volume2, ShieldAlert, ShieldCheck } from 'lucide-react';
+
+interface AudioVideoRoomProps {
+  socket: WebSocket | null;
+  roomId: string;
+  playerId: string;
+  players: Record<string, Player>;
+  existingPlayerIds: string[];
+  lastWebRtcSignal: { senderId: string; signal: any } | null;
+  lastDisconnectedPeerId: string | null;
+}
+
+const ICE_SERVERS = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+  ],
+};
+
+export default function AudioVideoRoom({
+  socket,
+  roomId,
+  playerId,
+  players,
+  existingPlayerIds,
+  lastWebRtcSignal,
+  lastDisconnectedPeerId,
+}: AudioVideoRoomProps) {
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
+  const [hasCamera, setHasCamera] = useState(false);
+  const [hasMic, setHasMic] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+
+  // Keep peer connections in ref to survive re-renders
+  const pcsRef = useRef<Record<string, RTCPeerConnection>>({});
+  const localVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Initialize Local Media Stream
+  useEffect(() => {
+    let activeStream: MediaStream | null = null;
+
+    async function setupLocalMedia() {
+      try {
+        // Step 1: Attempt fully enabled audio and video capture
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 320, height: 240, frameRate: 15 },
+          audio: true,
+        });
+        activeStream = stream;
+        setLocalStream(stream);
+        setHasCamera(true);
+        setHasMic(true);
+        setIsVideoOff(false);
+        setIsMuted(false);
+        updateMediaStatus(true, true);
+      } catch (err) {
+        console.warn('Webcam + Mic access failed. Trying audio only...', err);
+        try {
+          // Step 2: Attempt audio-only backup capture
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          activeStream = stream;
+          setLocalStream(stream);
+          setHasCamera(false);
+          setHasMic(true);
+          setIsVideoOff(true);
+          setIsMuted(false);
+          updateMediaStatus(false, true);
+        } catch (audioErr) {
+          // Step 3: Gracefully fallback with all devices offline
+          console.error('All hardware devices blocked or unavailable:', audioErr);
+          setHasCamera(false);
+          setHasMic(false);
+          setIsVideoOff(true);
+          setIsMuted(true);
+          updateMediaStatus(false, false);
+        }
+      }
+    }
+
+    setupLocalMedia();
+
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [roomId]);
+
+  // Hook local video stream element
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
+
+  // Sync local tracks to all existing peer connections when localStream is acquired or updated
+  useEffect(() => {
+    if (!localStream) return;
+    (Object.entries(pcsRef.current) as Array<[string, RTCPeerConnection]>).forEach(([targetId, pc]) => {
+      localStream.getTracks().forEach((track) => {
+        const alreadyAdded = pc.getSenders().some((s) => s.track === track);
+        if (!alreadyAdded) {
+          pc.addTrack(track, localStream);
+        }
+      });
+    });
+  }, [localStream]);
+
+  // Notify server of current media profile
+  function updateMediaStatus(camera: boolean, mic: boolean) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(
+        JSON.stringify({
+          type: 'toggle_media',
+          payload: { hasCamera: camera, hasMic: mic },
+        })
+      );
+    }
+  }
+
+  // Toggle Camera
+  const toggleCamera = () => {
+    if (!localStream || !hasCamera) return;
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+      const nextState = !videoTrack.enabled;
+      videoTrack.enabled = nextState;
+      setIsVideoOff(!nextState);
+      updateMediaStatus(nextState, !isMuted);
+    }
+  };
+
+  // Toggle Microphone
+  const toggleMic = () => {
+    if (!localStream || !hasMic) return;
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      const nextState = !audioTrack.enabled;
+      audioTrack.enabled = nextState;
+      setIsMuted(!nextState);
+      updateMediaStatus(!isVideoOff, nextState);
+    }
+  };
+
+  // Setup Peer Connection Helper
+  const createPeerConnection = (targetId: string): RTCPeerConnection => {
+    if (pcsRef.current[targetId]) {
+      return pcsRef.current[targetId];
+    }
+
+    const pc = new RTCPeerConnection(ICE_SERVERS);
+    (pc as any).iceQueue = [];
+
+    // Track state exchanges
+    pc.onicecandidate = (e) => {
+      if (e.candidate && socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(
+          JSON.stringify({
+            type: 'webrtc_signal',
+            payload: {
+              targetId,
+              signal: { type: 'candidate', candidate: e.candidate },
+            },
+          })
+        );
+      }
+    };
+
+    pc.ontrack = (e) => {
+      console.log('OnTrack event received for peer:', targetId, e.streams);
+      setRemoteStreams((prev) => {
+        const currentStream = prev[targetId];
+        let nextStream: MediaStream;
+        if (currentStream) {
+          if (!currentStream.getTracks().includes(e.track)) {
+            currentStream.addTrack(e.track);
+          }
+          nextStream = new MediaStream(currentStream.getTracks());
+        } else {
+          nextStream = e.streams[0] ? new MediaStream(e.streams[0].getTracks()) : new MediaStream([e.track]);
+        }
+        return { ...prev, [targetId]: nextStream };
+      });
+    };
+
+    // Attach local media tracks if active
+    if (localStream) {
+      localStream.getTracks().forEach((track) => {
+        pc.addTrack(track, localStream);
+      });
+    }
+
+    pcsRef.current[targetId] = pc;
+    return pc;
+  };
+
+  // Call all existing members when joining as a new member
+  useEffect(() => {
+    if (!localStream || existingPlayerIds.length === 0) return;
+
+    async function makeCalls() {
+      for (const targetId of existingPlayerIds) {
+        if (targetId === playerId) continue;
+        const pc = createPeerConnection(targetId);
+
+        try {
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(
+              JSON.stringify({
+                type: 'webrtc_signal',
+                payload: {
+                  targetId,
+                  signal: { type: 'offer', sdp: pc.localDescription },
+                },
+              })
+            );
+          }
+        } catch (err) {
+          console.error(`Failed initiating WebRTC call to peer: ${targetId}`, err);
+        }
+      }
+    }
+
+    makeCalls();
+  }, [localStream, existingPlayerIds]);
+
+  // Handle incoming WebRTC signals forwarded by the server
+  useEffect(() => {
+    if (!lastWebRtcSignal) return;
+
+    const { senderId, signal } = lastWebRtcSignal;
+    if (senderId === playerId) return;
+
+    async function processSignal() {
+      try {
+        if (signal.type === 'offer') {
+          const pc = createPeerConnection(senderId);
+          await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+
+          // Process queued ICE candidates
+          if ((pc as any).iceQueue) {
+            for (const cand of (pc as any).iceQueue) {
+              try {
+                await pc.addIceCandidate(new RTCIceCandidate(cand));
+              } catch (candErr) {
+                console.warn('Error processing queued ICE candidate:', candErr);
+              }
+            }
+            delete (pc as any).iceQueue;
+          }
+
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(
+              JSON.stringify({
+                type: 'webrtc_signal',
+                payload: {
+                  targetId: senderId,
+                  signal: { type: 'answer', sdp: pc.localDescription },
+                },
+              })
+            );
+          }
+        } else if (signal.type === 'answer') {
+          const pc = pcsRef.current[senderId];
+          if (pc) {
+            await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+
+            // Process queued ICE candidates
+            if ((pc as any).iceQueue) {
+              for (const cand of (pc as any).iceQueue) {
+                try {
+                  await pc.addIceCandidate(new RTCIceCandidate(cand));
+                } catch (candErr) {
+                  console.warn('Error processing queued ICE candidate:', candErr);
+                }
+              }
+              delete (pc as any).iceQueue;
+            }
+          }
+        } else if (signal.type === 'candidate') {
+          const pc = pcsRef.current[senderId];
+          if (pc) {
+            if (pc.remoteDescription && pc.remoteDescription.type) {
+              try {
+                await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+              } catch (e) {
+                console.warn('Failed to add immediate ICE candidate:', e);
+              }
+            } else {
+              if (!(pc as any).iceQueue) {
+                (pc as any).iceQueue = [];
+              }
+              (pc as any).iceQueue.push(signal.candidate);
+            }
+          }
+        }
+      } catch (err) {
+        console.error(`Error processing WebRTC signal from peer ${senderId}:`, err);
+      }
+    }
+
+    processSignal();
+  }, [lastWebRtcSignal]);
+
+  // Clean up disconnected player's WebRTC channels
+  useEffect(() => {
+    if (!lastDisconnectedPeerId) return;
+
+    const pc = pcsRef.current[lastDisconnectedPeerId];
+    if (pc) {
+      pc.close();
+      delete pcsRef.current[lastDisconnectedPeerId];
+    }
+
+    setRemoteStreams((prev) => {
+      const next = { ...prev };
+      delete next[lastDisconnectedPeerId];
+      return next;
+    });
+  }, [lastDisconnectedPeerId]);
+
+  return (
+    <div className="w-full bg-slate-100/60 border border-slate-200 rounded-2xl p-1.5 sm:p-2 shadow-sm shrink-0" id="room-media-panel">
+      {/* Grid List of Room Players with Integrated Streams (Horizontal Scrolling Layout) */}
+      <div className="flex gap-2 sm:gap-3 overflow-x-auto py-0.5 px-0.5 scrollbar-thin select-none scroll-smooth min-w-0 items-center" id="players-stream-grid">
+        
+        {/* Media Active Dashboard Control Hub (Sleek, inline space-saving controller) */}
+        <div className="flex flex-col items-center justify-center p-1.5 sm:p-2 bg-white border border-slate-200 rounded-xl shrink-0 gap-1.5 w-14 sm:w-16 h-24 sm:h-30 shadow-xs" id="media-panel-header">
+          <span className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest block text-center leading-none select-none">
+            MEDIA
+          </span>
+          <div className="flex flex-col items-center gap-1.5 sm:gap-2 w-full" id="local-media-triggers">
+            <button
+              onClick={toggleMic}
+              disabled={!hasMic}
+              className={`w-7 h-7 sm:w-8 h-8 rounded-full border transition-all cursor-pointer flex items-center justify-center ${
+                isMuted
+                  ? 'bg-red-50 border-red-200 text-brand-error hover:bg-red-100 shadow-inner'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 shadow-xs'
+              } disabled:opacity-50`}
+              title={isMuted ? 'Unmute Mic' : 'Mute Mic'}
+              aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+            >
+              {isMuted ? <MicOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+            </button>
+
+            <button
+              onClick={toggleCamera}
+              disabled={!hasCamera}
+              className={`w-7 h-7 sm:w-8 h-8 rounded-full border transition-all cursor-pointer flex items-center justify-center ${
+                isVideoOff
+                  ? 'bg-red-50 border-red-200 text-brand-error hover:bg-red-100 shadow-inner'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 shadow-xs'
+              } disabled:opacity-50`}
+              title={isVideoOff ? 'Enable Camera' : 'Disable Camera'}
+              aria-label={isVideoOff ? 'Turn camera on' : 'Turn camera off'}
+            >
+              {isVideoOff ? <VideoOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {Object.values(players)
+          .sort((a, b) => b.score - a.score)
+          .map((player, index) => {
+            const isSelf = player.id === playerId;
+            const remoteStream = remoteStreams[player.id];
+            const showVideo = isSelf ? !isVideoOff : player.hasCamera && remoteStream;
+
+            // Medals for top 3
+            const rankBadge = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+
+            // Border & Glow settings depending on active game states
+            let cardClasses = "relative w-36 h-24 sm:w-44 sm:h-30 flex-shrink-0 bg-slate-950 border rounded-xl sm:rounded-2xl overflow-hidden shadow-sm transition-all duration-300 cursor-default flex-none ";
+            if (player.isDrawer) {
+              cardClasses += "border-indigo-500 ring-2 ring-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.25)]";
+            } else if (player.guessed) {
+              cardClasses += "border-emerald-500 ring-2 ring-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.25)]";
+            } else {
+              cardClasses += "border-slate-200/50 hover:border-slate-300";
+            }
+            if (player.disconnected) {
+              cardClasses += " opacity-45 grayscale-[40%]";
+            }
+
+            return (
+              <div
+                key={player.id}
+                className={cardClasses}
+                id={`player-card-${player.id}`}
+              >
+                {/* Media Stream Video */}
+                {showVideo ? (
+                  isSelf ? (
+                    <video
+                      ref={localVideoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="absolute inset-0 w-full h-full object-cover scale-x-[-1]"
+                      id="local-stream-video"
+                    />
+                  ) : (
+                    <video
+                      ref={(el) => {
+                        if (el && remoteStream && el.srcObject !== remoteStream) {
+                           el.srcObject = remoteStream;
+                        }
+                      }}
+                      autoPlay
+                      playsInline
+                      className="absolute inset-0 w-full h-full object-cover"
+                      id={`remote-stream-${player.id}`}
+                    />
+                  )
+                ) : (
+                  // Fallback colored avatar on a beautiful dark gradient background
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-tr from-slate-950 via-slate-900 to-indigo-955">
+                    <div
+                      className="w-9.5 h-9.5 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-white font-black text-sm sm:text-base shadow-md border border-white/15 animate-pulse"
+                      style={{ backgroundColor: player.color }}
+                    >
+                      {player.name.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                )}
+
+                {/* Overlaid Badges (Top Left: Rank, Player Name, and Score in single floating glass tag) */}
+                <div className="absolute top-1.5 left-1.5 flex items-center z-10 max-w-[85%] select-none pointer-events-none" id={`player-info-${player.id}`}>
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-1 bg-slate-950/70 backdrop-blur-md rounded-full text-[8.5px] sm:text-[10px] font-black text-white shadow-md border border-white/10 shrink-0">
+                    <span className="mr-0.5 leading-none">{rankBadge}</span>
+                    <span className="truncate max-w-[45px] sm:max-w-[70px] uppercase tracking-wide leading-none">{player.name}</span>
+                    {isSelf && <span className="text-[7px] bg-indigo-600 text-white font-black px-1 py-px rounded-sm uppercase tracking-wider scale-90 select-none">You</span>}
+                    <span className="opacity-40 select-none">•</span>
+                    <span className="font-mono text-slate-200 leading-none">{player.score}</span>
+                  </div>
+                </div>
+
+                 {/* Overlaid Badges (Top Right: Correct, Drawing or Offline Status) */}
+                 {player.disconnected ? (
+                   <div className="absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 sm:px-2 bg-red-650/90 backdrop-blur-xs text-white text-[8px] font-black uppercase tracking-widest rounded-full border border-red-500 shadow-md animate-pulse z-10">
+                     🔌 Offline
+                   </div>
+                 ) : player.guessed ? (
+                   <div className="absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 sm:px-2 bg-emerald-600/90 backdrop-blur-xs text-white text-[8px] font-black uppercase tracking-widest rounded-full border border-emerald-500 shadow-md animate-bounce z-10" id={`guessed-badge-${player.id}`}>
+                     🎉 Correct
+                   </div>
+                 ) : player.isDrawer ? (
+                   <div className="absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 sm:px-2 bg-indigo-600/90 backdrop-blur-xs text-white text-[8px] font-black uppercase tracking-widest rounded-full border border-indigo-500 shadow-md animate-pulse z-10">
+                     Drawing
+                   </div>
+                 ) : null}
+
+                {/* Floating Mic status indicator on Bottom Right (no background obstruction) */}
+                <div className="absolute bottom-1.5 right-1.5 z-10">
+                  {player.id === playerId ? (
+                    isMuted ? (
+                      <div className="p-1 sm:p-1.5 bg-red-600/90 backdrop-blur-md rounded-full text-white border border-red-500/50 shadow-md">
+                        <MicOff className="w-2.5 h-2.5" />
+                      </div>
+                    ) : (
+                      <div className="p-1 sm:p-1.5 bg-black/40 backdrop-blur-md rounded-full text-slate-200 border border-white/10 shadow-md">
+                        <Mic className="w-2.5 h-2.5" />
+                      </div>
+                    )
+                  ) : !player.hasMic ? (
+                    <div className="p-1 sm:p-1.5 bg-red-600/95 backdrop-blur-md rounded-full text-white border border-red-500/50 shadow-md">
+                      <MicOff className="w-2.5 h-2.5" />
+                    </div>
+                  ) : (
+                    <div className="p-1 sm:p-1.5 bg-black/40 backdrop-blur-md rounded-full text-slate-200 border border-white/10 shadow-md">
+                      <Mic className="w-2.5 h-2.5" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Floating Points Gain indicator on Bottom Left */}
+                {player.roundScore > 0 && (
+                  <div className="absolute bottom-1.5 left-1.5 z-10 animate-bounce">
+                    <span className="text-[8.5px] sm:text-[9.5px] text-emerald-400 font-extrabold px-1.5 py-0.5 bg-slate-950/70 backdrop-blur-md border border-emerald-500/35 rounded-full shadow-md">
+                      +{player.roundScore} PTS
+                    </span>
+                  </div>
+                )}
+
+                {/* Silent background audio element */}
+                {!isSelf && remoteStream && (
+                  <audio
+                    ref={(el) => {
+                      if (el && el.srcObject !== remoteStream) {
+                        el.srcObject = remoteStream;
+                      }
+                    }}
+                    autoPlay
+                    playsInline
+                    style={{ display: 'none' }}
+                  />
+                )}
+              </div>
+            );
+          })}
+      </div>
+    </div>
+  );
+}

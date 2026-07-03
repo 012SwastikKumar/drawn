@@ -264,33 +264,43 @@ export default function DrawingCanvas({
       }
     });
 
-    // Render active temporary shape preview for drawer if dragging
-    if (isDrawing && tempEndPoint && currentTool !== 'brush' && currentStrokeRef.current.length > 0) {
-      const p1 = currentStrokeRef.current[0];
-      const p2 = tempEndPoint;
-
+    // Render active temporary shape preview or active brush stroke for drawer if dragging
+    if (isDrawing && currentStrokeRef.current.length > 0) {
       ctx.beginPath();
       ctx.strokeStyle = currentColor;
       ctx.lineWidth = currentSize * (dimensions.width / 600);
 
-      if (currentTool === 'line') {
-        ctx.moveTo(p1.x * dimensions.width, p1.y * dimensions.height);
-        ctx.lineTo(p2.x * dimensions.width, p2.y * dimensions.height);
+      if (currentTool === 'brush') {
+        const firstPoint = currentStrokeRef.current[0];
+        ctx.moveTo(firstPoint.x * dimensions.width, firstPoint.y * dimensions.height);
+        for (let i = 1; i < currentStrokeRef.current.length; i++) {
+          const p = currentStrokeRef.current[i];
+          ctx.lineTo(p.x * dimensions.width, p.y * dimensions.height);
+        }
         ctx.stroke();
-      } else if (currentTool === 'rect') {
-        const x1 = p1.x * dimensions.width;
-        const y1 = p1.y * dimensions.height;
-        const x2 = p2.x * dimensions.width;
-        const y2 = p2.y * dimensions.height;
-        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-      } else if (currentTool === 'circle') {
-        const x1 = p1.x * dimensions.width;
-        const y1 = p1.y * dimensions.height;
-        const x2 = p2.x * dimensions.width;
-        const y2 = p2.y * dimensions.height;
-        const radius = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-        ctx.arc(x1, y1, radius, 0, 2 * Math.PI);
-        ctx.stroke();
+      } else if (tempEndPoint) {
+        const p1 = currentStrokeRef.current[0];
+        const p2 = tempEndPoint;
+
+        if (currentTool === 'line') {
+          ctx.moveTo(p1.x * dimensions.width, p1.y * dimensions.height);
+          ctx.lineTo(p2.x * dimensions.width, p2.y * dimensions.height);
+          ctx.stroke();
+        } else if (currentTool === 'rect') {
+          const x1 = p1.x * dimensions.width;
+          const y1 = p1.y * dimensions.height;
+          const x2 = p2.x * dimensions.width;
+          const y2 = p2.y * dimensions.height;
+          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        } else if (currentTool === 'circle') {
+          const x1 = p1.x * dimensions.width;
+          const y1 = p1.y * dimensions.height;
+          const x2 = p2.x * dimensions.width;
+          const y2 = p2.y * dimensions.height;
+          const radius = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+          ctx.arc(x1, y1, radius, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
       }
     }
   }, [strokes, dimensions, tempEndPoint, currentTool, isDrawing, currentColor, currentSize]);

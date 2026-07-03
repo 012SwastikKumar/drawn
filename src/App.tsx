@@ -526,6 +526,19 @@ export default function App() {
   // Drawer Action: Draw single stroke line
   const handleDrawStroke = (stroke: Stroke) => {
     if (!socket || !roomId) return;
+    
+    // Update local strokes state immediately so drawer has high-fidelity real-time rendering
+    setStrokes((prev) => {
+      const index = prev.findIndex((s) => s.id === stroke.id);
+      if (index >= 0) {
+        const updated = [...prev];
+        updated[index] = stroke;
+        return updated;
+      } else {
+        return [...prev, stroke];
+      }
+    });
+
     socket.send(
       JSON.stringify({
         type: 'draw_stroke',
@@ -537,6 +550,7 @@ export default function App() {
   // Drawer Action: Clear the canvas
   const handleClearCanvas = () => {
     if (!socket || !roomId) return;
+    setStrokes([]);
     socket.send(
       JSON.stringify({
         type: 'clear_canvas',
@@ -548,6 +562,7 @@ export default function App() {
   // Drawer Action: Undo the last stroke
   const handleUndoStroke = () => {
     if (!socket || !roomId) return;
+    setStrokes((prev) => prev.slice(0, -1));
     socket.send(
       JSON.stringify({
         type: 'undo_stroke',
@@ -793,7 +808,7 @@ export default function App() {
               {player?.isHost && room.status !== 'LOBBY' && (
                 <button
                   onClick={() => setShowHostSettings(true)}
-                  className="h-9 px-2 sm:px-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-[10px] sm:text-xs font-black text-white border border-indigo-700 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-xs shrink-0 animate-pulse"
+                  className="h-9 px-2.5 sm:px-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-[10px] sm:text-xs font-black text-white border border-indigo-700 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-xs shrink-0"
                   title="Open Host Settings Panel"
                   id="host-settings-trigger-btn"
                 >
@@ -838,10 +853,10 @@ export default function App() {
               </button>
               <button
                 onClick={handleLeaveRoom}
-                className="h-9 px-3 sm:px-4 bg-red-600 hover:bg-red-700 rounded-xl text-[10px] sm:text-xs font-black text-white border border-red-750 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-xs shrink-0"
+                className="h-9 px-2.5 sm:px-4 bg-red-600 hover:bg-red-700 rounded-xl text-[10px] sm:text-xs font-black text-white border border-red-750 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-xs shrink-0"
               >
                 <LogOut className="w-4 h-4" />
-                <span>LEAVE</span>
+                <span className="hidden sm:inline">LEAVE</span>
               </button>
             </div>
           </header>

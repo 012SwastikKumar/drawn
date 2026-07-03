@@ -670,8 +670,8 @@ export default function DrawingCanvas({
             </div>
           </div>
 
-          {/* Section 2: Unified Tools Segmented Control (Enlarged ONLY for mobile thumb viewports) */}
-          <div className="flex items-center bg-white border border-slate-200/80 rounded-xl p-1 gap-1 shadow-2xs overflow-x-auto scrollbar-none max-w-[70%] sm:max-w-none" id="drawing-tools-switcher">
+          {/* Section 2: Unified Tools Segmented Control (Standard Compact Size) */}
+          <div className="flex items-center bg-white border border-slate-200/80 rounded-xl p-0.5 gap-0.5 shadow-2xs overflow-x-auto scrollbar-none max-w-[70%] sm:max-w-none" id="drawing-tools-switcher">
             <button
               onClick={() => {
                 setCurrentTool('brush');
@@ -679,7 +679,7 @@ export default function DrawingCanvas({
                   setCurrentColor('#000000');
                 }
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'brush' && currentColor !== '#ffffff'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -687,14 +687,14 @@ export default function DrawingCanvas({
               title="Pencil / Freehand Brush"
               aria-label="Brush tool"
             >
-              <Pencil className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <Pencil className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('line');
                 if (currentColor === '#ffffff') setCurrentColor('#000000');
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'line'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -702,14 +702,14 @@ export default function DrawingCanvas({
               title="Draw Straight Line"
               aria-label="Line tool"
             >
-              <Minus className="w-5 h-5 sm:w-3.5 sm:h-3.5 rotate-45" />
+              <Minus className="w-3.5 h-3.5 rotate-45" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('arrow');
                 if (currentColor === '#ffffff') setCurrentColor('#000000');
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'arrow'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -717,14 +717,14 @@ export default function DrawingCanvas({
               title="Draw Arrow"
               aria-label="Arrow tool"
             >
-              <ArrowUpRight className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('rect');
                 if (currentColor === '#ffffff') setCurrentColor('#000000');
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'rect'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -732,14 +732,14 @@ export default function DrawingCanvas({
               title="Draw Rectangle"
               aria-label="Rectangle tool"
             >
-              <Square className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <Square className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('circle');
                 if (currentColor === '#ffffff') setCurrentColor('#000000');
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'circle'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -747,14 +747,14 @@ export default function DrawingCanvas({
               title="Draw Circle"
               aria-label="Circle tool"
             >
-              <Circle className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <Circle className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('triangle');
                 if (currentColor === '#ffffff') setCurrentColor('#000000');
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'triangle'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -762,14 +762,14 @@ export default function DrawingCanvas({
               title="Draw Triangle"
               aria-label="Triangle tool"
             >
-              <Triangle className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <Triangle className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('star');
                 if (currentColor === '#ffffff') setCurrentColor('#000000');
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'star'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -777,14 +777,14 @@ export default function DrawingCanvas({
               title="Draw Star"
               aria-label="Star tool"
             >
-              <Star className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <Star className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('diamond');
                 if (currentColor === '#ffffff') setCurrentColor('#000000');
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'diamond'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -792,14 +792,14 @@ export default function DrawingCanvas({
               title="Draw Diamond"
               aria-label="Diamond tool"
             >
-              <Diamond className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <Diamond className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('fill');
                 if (currentColor === '#ffffff') setCurrentColor('#000000');
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentTool === 'fill'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -807,14 +807,14 @@ export default function DrawingCanvas({
               title="Paint Bucket (Flood Fill Area)"
               aria-label="Paint bucket fill tool"
             >
-              <PaintBucket className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <PaintBucket className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setCurrentTool('brush');
                 setCurrentColor('#ffffff'); // white acts as eraser
               }}
-              className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
+              className={`p-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
                 currentColor === '#ffffff' && currentTool === 'brush'
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -822,7 +822,7 @@ export default function DrawingCanvas({
               title="Eraser Tool"
               aria-label="Eraser tool"
             >
-              <Eraser className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
+              <Eraser className="w-3.5 h-3.5" />
             </button>
           </div>
 

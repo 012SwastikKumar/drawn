@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Stroke, Point, Player } from '../types.js';
-import { Trash2, RotateCcw, Paintbrush, Eraser, Minus, Square, Circle, PaintBucket } from 'lucide-react';
+import { Trash2, RotateCcw, Paintbrush, Eraser, Minus, Square, Circle, PaintBucket, ArrowUpRight, Triangle, Star, Diamond } from 'lucide-react';
 
 interface DrawingCanvasProps {
   isDrawer: boolean;
@@ -159,7 +159,7 @@ export default function DrawingCanvas({
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState('#000000');
   const [currentSize, setCurrentSize] = useState(8);
-  const [currentTool, setCurrentTool] = useState<'brush' | 'line' | 'rect' | 'circle' | 'fill'>('brush');
+  const [currentTool, setCurrentTool] = useState<'brush' | 'line' | 'rect' | 'circle' | 'fill' | 'arrow' | 'triangle' | 'star' | 'diamond'>('brush');
   const [tempEndPoint, setTempEndPoint] = useState<Point | null>(null);
 
   const currentStrokeRef = useRef<Point[]>([]);
@@ -254,6 +254,68 @@ export default function DrawingCanvas({
         ctx.moveTo(p1.x * dimensions.width, p1.y * dimensions.height);
         ctx.lineTo(p2.x * dimensions.width, p2.y * dimensions.height);
         ctx.stroke();
+      } else if (type === 'arrow' && stroke.points.length >= 2) {
+        const p1 = stroke.points[0];
+        const p2 = stroke.points[stroke.points.length - 1];
+        const x1 = p1.x * dimensions.width;
+        const y1 = p1.y * dimensions.height;
+        const x2 = p2.x * dimensions.width;
+        const y2 = p2.y * dimensions.height;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        const headLength = 12 * (dimensions.width / 600);
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - headLength * Math.cos(angle - Math.PI / 6), y2 - headLength * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - headLength * Math.cos(angle + Math.PI / 6), y2 - headLength * Math.sin(angle + Math.PI / 6));
+        ctx.stroke();
+      } else if (type === 'triangle' && stroke.points.length >= 2) {
+        const p1 = stroke.points[0];
+        const p2 = stroke.points[stroke.points.length - 1];
+        const x1 = p1.x * dimensions.width;
+        const y1 = p1.y * dimensions.height;
+        const x2 = p2.x * dimensions.width;
+        const y2 = p2.y * dimensions.height;
+        ctx.moveTo((x1 + x2) / 2, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x1, y2);
+        ctx.closePath();
+        ctx.stroke();
+      } else if (type === 'star' && stroke.points.length >= 2) {
+        const p1 = stroke.points[0];
+        const p2 = stroke.points[stroke.points.length - 1];
+        const x1 = p1.x * dimensions.width;
+        const y1 = p1.y * dimensions.height;
+        const x2 = p2.x * dimensions.width;
+        const y2 = p2.y * dimensions.height;
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+        const rx = Math.abs(x2 - x1) / 2;
+        const ry = Math.abs(y2 - y1) / 2;
+        const pointsCount = 5;
+        ctx.moveTo(cx, cy - ry);
+        for (let i = 0; i < pointsCount * 2; i++) {
+          const r = i % 2 === 0 ? ry : ry / 2.5;
+          const rx_scaled = i % 2 === 0 ? rx : rx / 2.5;
+          const angle = (Math.PI * i) / pointsCount - Math.PI / 2;
+          ctx.lineTo(cx + rx_scaled * Math.cos(angle), cy + r * Math.sin(angle));
+        }
+        ctx.closePath();
+        ctx.stroke();
+      } else if (type === 'diamond' && stroke.points.length >= 2) {
+        const p1 = stroke.points[0];
+        const p2 = stroke.points[stroke.points.length - 1];
+        const x1 = p1.x * dimensions.width;
+        const y1 = p1.y * dimensions.height;
+        const x2 = p2.x * dimensions.width;
+        const y2 = p2.y * dimensions.height;
+        ctx.moveTo((x1 + x2) / 2, y1);
+        ctx.lineTo(x2, (y1 + y2) / 2);
+        ctx.lineTo((x1 + x2) / 2, y2);
+        ctx.lineTo(x1, (y1 + y2) / 2);
+        ctx.closePath();
+        ctx.stroke();
       } else if (type === 'rect' && stroke.points.length >= 2) {
         const p1 = stroke.points[0];
         const p2 = stroke.points[stroke.points.length - 1];
@@ -305,6 +367,60 @@ export default function DrawingCanvas({
         if (currentTool === 'line') {
           ctx.moveTo(p1.x * dimensions.width, p1.y * dimensions.height);
           ctx.lineTo(p2.x * dimensions.width, p2.y * dimensions.height);
+          ctx.stroke();
+        } else if (currentTool === 'arrow') {
+          const x1 = p1.x * dimensions.width;
+          const y1 = p1.y * dimensions.height;
+          const x2 = p2.x * dimensions.width;
+          const y2 = p2.y * dimensions.height;
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          const headLength = 12 * (dimensions.width / 600);
+          ctx.moveTo(x2, y2);
+          ctx.lineTo(x2 - headLength * Math.cos(angle - Math.PI / 6), y2 - headLength * Math.sin(angle - Math.PI / 6));
+          ctx.moveTo(x2, y2);
+          ctx.lineTo(x2 - headLength * Math.cos(angle + Math.PI / 6), y2 - headLength * Math.sin(angle + Math.PI / 6));
+          ctx.stroke();
+        } else if (currentTool === 'triangle') {
+          const x1 = p1.x * dimensions.width;
+          const y1 = p1.y * dimensions.height;
+          const x2 = p2.x * dimensions.width;
+          const y2 = p2.y * dimensions.height;
+          ctx.moveTo((x1 + x2) / 2, y1);
+          ctx.lineTo(x2, y2);
+          ctx.lineTo(x1, y2);
+          ctx.closePath();
+          ctx.stroke();
+        } else if (currentTool === 'star') {
+          const x1 = p1.x * dimensions.width;
+          const y1 = p1.y * dimensions.height;
+          const x2 = p2.x * dimensions.width;
+          const y2 = p2.y * dimensions.height;
+          const cx = (x1 + x2) / 2;
+          const cy = (y1 + y2) / 2;
+          const rx = Math.abs(x2 - x1) / 2;
+          const ry = Math.abs(y2 - y1) / 2;
+          const pointsCount = 5;
+          ctx.moveTo(cx, cy - ry);
+          for (let i = 0; i < pointsCount * 2; i++) {
+            const r = i % 2 === 0 ? ry : ry / 2.5;
+            const rx_scaled = i % 2 === 0 ? rx : rx / 2.5;
+            const angle = (Math.PI * i) / pointsCount - Math.PI / 2;
+            ctx.lineTo(cx + rx_scaled * Math.cos(angle), cy + r * Math.sin(angle));
+          }
+          ctx.closePath();
+          ctx.stroke();
+        } else if (currentTool === 'diamond') {
+          const x1 = p1.x * dimensions.width;
+          const y1 = p1.y * dimensions.height;
+          const x2 = p2.x * dimensions.width;
+          const y2 = p2.y * dimensions.height;
+          ctx.moveTo((x1 + x2) / 2, y1);
+          ctx.lineTo(x2, (y1 + y2) / 2);
+          ctx.lineTo((x1 + x2) / 2, y2);
+          ctx.lineTo(x1, (y1 + y2) / 2);
+          ctx.closePath();
           ctx.stroke();
         } else if (currentTool === 'rect') {
           const x1 = p1.x * dimensions.width;
@@ -493,8 +609,8 @@ export default function DrawingCanvas({
           {/* ROW 1: Colors Palette + Board Commands */}
           <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap">
             
-            {/* Left: Swatches selection grid */}
-            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 px-2" id="color-palette-selection">
+            {/* Left: Swatches selection grid (Enlarged for touch accessibility) */}
+            <div className="flex items-center gap-2 overflow-x-auto py-1 px-2 scrollbar-none" id="color-palette-selection">
               {BRUSH_COLORS.map((color) => (
                 <button
                   key={color}
@@ -505,9 +621,9 @@ export default function DrawingCanvas({
                     }
                   }}
                   style={{ backgroundColor: color }}
-                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center ${
+                  className={`w-6 h-6 sm:w-7.5 sm:h-7.5 rounded-full border shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center shrink-0 ${
                     currentColor === color
-                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
+                      ? 'scale-115 border-2 border-slate-750 shadow-md z-10'
                       : 'border-slate-200 hover:scale-110 hover:shadow-2xs'
                   }`}
                   title={color === '#ffffff' ? 'Eraser Color' : `Color ${color}`}
@@ -515,7 +631,7 @@ export default function DrawingCanvas({
                 >
                   {/* Selected Color Indicator Dot */}
                   {currentColor === color && (
-                    <span className={`w-1.5 h-1.5 rounded-full ${color === '#ffffff' ? 'bg-slate-600' : 'bg-white'} shadow-xs`} />
+                    <span className={`w-2 h-2 rounded-full ${color === '#ffffff' ? 'bg-slate-600' : 'bg-white'} shadow-xs`} />
                   )}
                 </button>
               ))}
@@ -524,9 +640,9 @@ export default function DrawingCanvas({
               <div className="relative flex items-center justify-center shrink-0">
                 <button
                   onClick={() => document.getElementById('gradient-color-input')?.click()}
-                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
+                  className={`w-6 h-6 sm:w-7.5 sm:h-7.5 rounded-full border transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
                     !BRUSH_COLORS.includes(currentColor)
-                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
+                      ? 'scale-115 border-2 border-slate-750 shadow-md z-10'
                       : 'border-slate-200 shadow-3xs'
                   }`}
                   style={{
@@ -537,7 +653,7 @@ export default function DrawingCanvas({
                 >
                   {/* Selected Custom Color Indicator Dot */}
                   {!BRUSH_COLORS.includes(currentColor) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
+                    <span className="w-2 h-2 rounded-full bg-white shadow-xs" />
                   )}
                 </button>
                 <input
@@ -557,34 +673,34 @@ export default function DrawingCanvas({
               </div>
             </div>
 
-            {/* Right: Board Commands (Undo / Clear Canvas) */}
-            <div className="flex items-center gap-2" id="canvas-actions-bar">
+            {/* Right: Board Commands (Undo / Clear Canvas) (Enlarged) */}
+            <div className="flex items-center gap-2.5" id="canvas-actions-bar">
               <button
                 onClick={onUndoStroke}
-                className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
+                className="p-2 sm:p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1.5 text-xs font-black px-3.5 active:scale-95"
                 title="Undo last stroke"
                 aria-label="Undo last stroke"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-4.5 h-4.5" />
                 <span className="hidden xs:inline">UNDO</span>
               </button>
               <button
                 onClick={onClearCanvas}
-                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-100 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
+                className="p-2 sm:p-2.5 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-100 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1.5 text-xs font-black px-3.5 active:scale-95"
                 title="Clear Board"
                 aria-label="Clear drawing canvas"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4.5 h-4.5" />
                 <span className="hidden xs:inline text-red-650">CLEAR</span>
               </button>
             </div>
           </div>
 
           {/* ROW 2: Tools + Brush Sizes */}
-          <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap border-t border-slate-200/60 pt-2">
+          <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap border-t border-slate-200/60 pt-2.5">
             
-            {/* Left: Unified Tools Segmented Control */}
-            <div className="flex items-center bg-white border border-slate-200/80 rounded-xl p-1 gap-1 shadow-2xs" id="drawing-tools-switcher">
+            {/* Left: Unified Tools Segmented Control (Enlarged with Arrow, Triangle, Star, Diamond) */}
+            <div className="flex items-center bg-white border border-slate-200/80 rounded-2xl p-1 gap-1 shadow-2xs overflow-x-auto scrollbar-none max-w-[70%] sm:max-w-none" id="drawing-tools-switcher">
               <button
                 onClick={() => {
                   setCurrentTool('brush');
@@ -592,7 +708,7 @@ export default function DrawingCanvas({
                     setCurrentColor('#000000');
                   }
                 }}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
                   currentTool === 'brush' && currentColor !== '#ffffff'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -600,14 +716,14 @@ export default function DrawingCanvas({
                 title="Pencil / Freehand Brush"
                 aria-label="Brush tool"
               >
-                <Paintbrush className="w-3.5 h-3.5" />
+                <Paintbrush className="w-5 h-5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('line');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
                   currentTool === 'line'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -615,14 +731,29 @@ export default function DrawingCanvas({
                 title="Draw Straight Line"
                 aria-label="Line tool"
               >
-                <Minus className="w-3.5 h-3.5 rotate-45" />
+                <Minus className="w-5 h-5 rotate-45" />
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentTool('arrow');
+                  if (currentColor === '#ffffff') setCurrentColor('#000000');
+                }}
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                  currentTool === 'arrow'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
+                title="Draw Arrow"
+                aria-label="Arrow tool"
+              >
+                <ArrowUpRight className="w-5 h-5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('rect');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
                   currentTool === 'rect'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -630,14 +761,14 @@ export default function DrawingCanvas({
                 title="Draw Rectangle"
                 aria-label="Rectangle tool"
               >
-                <Square className="w-3.5 h-3.5" />
+                <Square className="w-5 h-5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('circle');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
                   currentTool === 'circle'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -645,14 +776,59 @@ export default function DrawingCanvas({
                 title="Draw Circle"
                 aria-label="Circle tool"
               >
-                <Circle className="w-3.5 h-3.5" />
+                <Circle className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentTool('triangle');
+                  if (currentColor === '#ffffff') setCurrentColor('#000000');
+                }}
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                  currentTool === 'triangle'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
+                title="Draw Triangle"
+                aria-label="Triangle tool"
+              >
+                <Triangle className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentTool('star');
+                  if (currentColor === '#ffffff') setCurrentColor('#000000');
+                }}
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                  currentTool === 'star'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
+                title="Draw Star"
+                aria-label="Star tool"
+              >
+                <Star className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentTool('diamond');
+                  if (currentColor === '#ffffff') setCurrentColor('#000000');
+                }}
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                  currentTool === 'diamond'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
+                title="Draw Diamond"
+                aria-label="Diamond tool"
+              >
+                <Diamond className="w-5 h-5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('fill');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
                   currentTool === 'fill'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -660,14 +836,14 @@ export default function DrawingCanvas({
                 title="Paint Bucket (Flood Fill Area)"
                 aria-label="Paint bucket fill tool"
               >
-                <PaintBucket className="w-3.5 h-3.5" />
+                <PaintBucket className="w-5 h-5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('brush');
                   setCurrentColor('#ffffff'); // white acts as eraser
                 }}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
                   currentColor === '#ffffff' && currentTool === 'brush'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -675,20 +851,20 @@ export default function DrawingCanvas({
                 title="Eraser Tool"
                 aria-label="Eraser tool"
               >
-                <Eraser className="w-3.5 h-3.5" />
+                <Eraser className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Right: Brush Sizing Segment controller */}
+            {/* Right: Brush Sizing Segment controller (Enlarged) */}
             <div className="flex items-center gap-1 shrink-0" id="brush-size-selection">
               {currentTool !== 'fill' ? (
-                <div className="flex items-center bg-slate-200/50 border border-slate-250/70 rounded-xl p-0.5 gap-0.5 shadow-3xs" id="size-segmented-control">
+                <div className="flex items-center bg-slate-200/50 border border-slate-250/70 rounded-2xl p-1 gap-1 shadow-3xs" id="size-segmented-control">
                   {BRUSH_SIZES.map((size) => {
                     return (
                       <button
                         key={size.value}
                         onClick={() => setCurrentSize(size.value)}
-                        className={`px-2.5 py-0.5 text-[9px] font-black uppercase rounded-lg transition-all cursor-pointer ${
+                        className={`px-3.5 py-1 text-xs font-black uppercase rounded-xl transition-all cursor-pointer ${
                           currentSize === size.value
                             ? 'bg-brand-primary text-white shadow-sm'
                             : 'text-slate-500 hover:text-slate-800'
@@ -702,7 +878,7 @@ export default function DrawingCanvas({
                   })}
                 </div>
               ) : (
-                <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider px-1 bg-slate-100 rounded-lg py-0.5 border border-slate-200">FILL MODE</span>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2 bg-slate-100 rounded-xl py-1.5 border border-slate-200">FILL MODE</span>
               )}
             </div>
 

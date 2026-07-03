@@ -169,7 +169,7 @@ export default function DrawingCanvas({
 
   // Define layout states to show the leaderboard dynamically in empty areas
   const [showLeftLeaderboard, setShowLeftLeaderboard] = useState(false);
-  const [showBottomLeaderboard, setShowBottomLeaderboard] = useState(false);
+  const [showTopLeaderboard, setShowTopLeaderboard] = useState(false);
 
   // Handle resizing using ResizeObserver for fluid, responsive dimensions with locked aspect ratio
   useEffect(() => {
@@ -206,10 +206,10 @@ export default function DrawingCanvas({
           const bottomSpace = (containerHeight - targetHeight) / 2;
 
           setShowLeftLeaderboard(leftSpace >= 150);
-          setShowBottomLeaderboard(leftSpace < 150 && bottomSpace >= 80);
+          setShowTopLeaderboard(leftSpace < 150 && bottomSpace >= 80);
         } else {
           setShowLeftLeaderboard(false);
-          setShowBottomLeaderboard(false);
+          setShowTopLeaderboard(false);
         }
       }
     });
@@ -488,7 +488,7 @@ export default function DrawingCanvas({
     <div className="flex flex-col h-full gap-2 sm:gap-3" id="canvas-container-root">
       {/* Interactive drawing utility panel (Only displayed for drawer when not in PiP mode) */}
       {isDrawer && !isPip && (
-        <div className="flex flex-col gap-2 p-2 bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs text-slate-700 w-full animate-fade-in" id="canvas-palette-bar">
+        <div className="flex flex-col gap-2 p-2 bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs text-slate-700 w-full animate-fade-in order-2 sm:order-1" id="canvas-palette-bar">
           
           {/* ROW 1: Action Inputs (Tools + Board Commands) */}
           <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap">
@@ -715,7 +715,7 @@ export default function DrawingCanvas({
       <div
         ref={containerRef}
         style={cursorStyle}
-        className={`relative flex-1 bg-slate-100 border border-slate-200 rounded-2xl shadow-drawn-sm overflow-hidden ${
+        className={`relative flex-1 bg-slate-100 border border-slate-200 rounded-2xl shadow-drawn-sm overflow-hidden order-1 sm:order-2 ${
           isPip ? 'min-h-0' : 'min-h-[300px]'
         }`}
         id="canvas-drawing-wrapper"
@@ -747,7 +747,7 @@ export default function DrawingCanvas({
 
         {/* Guesser Mode Overlays */}
         {!isDrawer && !isPip && (
-          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/95 text-brand-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-100 shadow-drawn-md backdrop-blur-xs select-none pointer-events-none animate-pulse" id="canvas-guesser-badge">
+          <div className={`absolute left-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/95 text-brand-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-100 shadow-drawn-md backdrop-blur-xs select-none pointer-events-none animate-pulse ${showTopLeaderboard ? 'top-14' : 'top-3'}`} id="canvas-guesser-badge">
             <Paintbrush className="w-3.5 h-3.5" />
             <span>Watching Drawer...</span>
           </div>
@@ -793,9 +793,9 @@ export default function DrawingCanvas({
           </div>
         )}
 
-        {/* Bottom Always-On Strip Leaderboard (Only shown if space permits) */}
-        {!isPip && players && showBottomLeaderboard && (
-          <div className="absolute bottom-2.5 left-2.5 right-2.5 h-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-xl p-1.5 shadow-drawn-sm flex items-center justify-start gap-1.5 z-20 animate-fade-in text-slate-800 overflow-x-auto scrollbar-none" id="canvas-bottom-leaderboard">
+        {/* Top Always-On Strip Leaderboard (Only shown if space permits in mobile/vertical layouts) */}
+        {!isPip && players && showTopLeaderboard && (
+          <div className="absolute top-2.5 left-2.5 right-2.5 h-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-xl p-1.5 shadow-drawn-sm flex items-center justify-start gap-1.5 z-20 animate-fade-in text-slate-800 overflow-x-auto scrollbar-none" id="canvas-top-leaderboard">
             <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-200 pr-1.5 mr-0.5 shrink-0 leading-none">
               Rankings
             </span>

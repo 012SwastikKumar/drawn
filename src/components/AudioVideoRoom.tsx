@@ -242,6 +242,19 @@ export default function AudioVideoRoom({
     async function processSignal() {
       try {
         if (signal.type === 'offer') {
+          // Proactively close and remove any existing stale peer connection for this sender (e.g. on reload/reconnect)
+          const stalePc = pcsRef.current[senderId];
+          if (stalePc) {
+            console.log(`Closing stale peer connection for reconnecting peer: ${senderId}`);
+            try { stalePc.close(); } catch (e) {}
+            delete pcsRef.current[senderId];
+            setRemoteStreams((prev) => {
+              const next = { ...prev };
+              delete next[senderId];
+              return next;
+            });
+          }
+
           const pc = createPeerConnection(senderId);
           await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
 
@@ -329,6 +342,29 @@ export default function AudioVideoRoom({
       return next;
     });
   }, [lastDisconnectedPeerId]);
+
+  // Clean up disconnected player's WebRTC channels dynamically when they go offline during grace period
+  useEffect(() => {
+    Object.keys(pcsRef.current).forEach((targetId) => {
+      const p = players[targetId];
+      if (p && p.disconnected) {
+        console.log(`Proactively cleaning up stale WebRTC connection for disconnected player: ${targetId}`);
+        const pc = pcsRef.current[targetId];
+        if (pc) {
+          try { pc.close(); } catch (e) {}
+          delete pcsRef.current[targetId];
+        }
+        setRemoteStreams((prev) => {
+          if (prev[targetId]) {
+            const next = { ...prev };
+            delete next[targetId];
+            return next;
+          }
+          return prev;
+        });
+      }
+    });
+  }, [players]);
 
   return (
     <div className="w-full bg-slate-100/60 border border-slate-200 rounded-2xl p-1.5 sm:p-2 shadow-sm shrink-0" id="room-media-panel">

@@ -478,6 +478,19 @@ export default function AudioVideoRoom({
                 className={cardClasses}
                 id={`player-card-${player.id}`}
               >
+                {/* Background continuous audio player to keep sound playing even if video is toggled off/unmounted */}
+                {remoteStream && !isSelf && (
+                  <audio
+                    ref={(el) => {
+                      if (el && el.srcObject !== remoteStream) {
+                        el.srcObject = remoteStream;
+                      }
+                    }}
+                    autoPlay
+                    className="hidden animate-fade-in"
+                  />
+                )}
+
                 {/* Media Stream Video */}
                 {showVideo ? (
                   isSelf ? (
@@ -503,6 +516,7 @@ export default function AudioVideoRoom({
                       }}
                       autoPlay
                       playsInline
+                      muted // Muted to avoid browser autoplay policy blocks (handled by background audio element)
                       className="absolute inset-0 w-full h-full object-cover"
                       id={`remote-stream-${player.id}`}
                     />

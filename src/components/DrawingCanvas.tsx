@@ -204,9 +204,11 @@ export default function DrawingCanvas({
         if (!isPip) {
           const leftSpace = (containerWidth - targetWidth) / 2;
           const bottomSpace = (containerHeight - targetHeight) / 2;
-
-          setShowLeftLeaderboard(leftSpace >= 150);
-          setShowTopLeaderboard(leftSpace < 150 && bottomSpace >= 80);
+          
+          // Disable canvas overlays in laptop/desktop viewports (640px wide and above) to keep drawing space clean
+          const isWidescreen = window.innerWidth >= 640;
+          setShowLeftLeaderboard(!isWidescreen && leftSpace >= 150);
+          setShowTopLeaderboard(!isWidescreen && leftSpace < 150 && bottomSpace >= 80);
         } else {
           setShowLeftLeaderboard(false);
           setShowTopLeaderboard(false);

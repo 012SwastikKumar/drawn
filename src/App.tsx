@@ -976,10 +976,15 @@ export default function App() {
               {/* LOBBY VIEW before game active */}
               {room.status === 'LOBBY' && (
                 <div className="flex flex-col items-center justify-center flex-1 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-2xl mx-auto my-auto shadow-xl text-slate-850 overflow-y-auto w-full" id="lobby-setup-panel">
-                  <div className="text-center mb-6">
-                    <Crown className="w-12 h-12 text-amber-500 mx-auto mb-2 animate-bounce" />
-                    <h3 className="text-sm font-black uppercase tracking-wider text-slate-800">Room Setup Lobby</h3>
-                    <p className="text-xs text-slate-500 mt-1">Configure rounds and wait for players to turn on their media.</p>
+                  <div className="text-center mb-6 animate-fade-in">
+                    <img
+                      src="/lobby-logo.png"
+                      alt="Drawn - Draw. Guess. Laugh. Repeat."
+                      className="w-48 sm:w-60 h-auto mx-auto mb-3 object-contain hover:scale-105 transition-transform duration-300 select-none pointer-events-none"
+                      id="lobby-logo-img"
+                    />
+                    <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-500">Room Setup Lobby</h3>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Configure rounds and wait for teammates to join.</p>
                   </div>
 
                   {/* Settings dashboard */}

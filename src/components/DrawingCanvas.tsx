@@ -490,8 +490,98 @@ export default function DrawingCanvas({
       {isDrawer && !isPip && (
         <div className="flex flex-col gap-2 p-2 bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs text-slate-700 w-full animate-fade-in order-2 sm:order-1" id="canvas-palette-bar">
           
-          {/* ROW 1: Action Inputs (Tools + Board Commands) */}
+          {/* ROW 1: Colors Palette + Board Commands */}
           <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap">
+            
+            {/* Left: Swatches selection grid */}
+            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 px-2" id="color-palette-selection">
+              {BRUSH_COLORS.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => {
+                    setCurrentColor(color);
+                    if (color === '#ffffff') {
+                      setCurrentTool('brush');
+                    }
+                  }}
+                  style={{ backgroundColor: color }}
+                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center ${
+                    currentColor === color
+                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
+                      : 'border-slate-200 hover:scale-110 hover:shadow-2xs'
+                  }`}
+                  title={color === '#ffffff' ? 'Eraser Color' : `Color ${color}`}
+                  aria-label={`Select ${color === '#ffffff' ? 'eraser' : `color ${color}`}`}
+                >
+                  {/* Selected Color Indicator Dot */}
+                  {currentColor === color && (
+                    <span className={`w-1.5 h-1.5 rounded-full ${color === '#ffffff' ? 'bg-slate-600' : 'bg-white'} shadow-xs`} />
+                  )}
+                </button>
+              ))}
+
+              {/* Beautiful Custom Color Gradient Picker */}
+              <div className="relative flex items-center justify-center shrink-0">
+                <button
+                  onClick={() => document.getElementById('gradient-color-input')?.click()}
+                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
+                    !BRUSH_COLORS.includes(currentColor)
+                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
+                      : 'border-slate-200 shadow-3xs'
+                  }`}
+                  style={{
+                    background: 'conic-gradient(from 180deg at 50% 50%, #ff0000 0deg, #ffff00 60deg, #00ff00 120deg, #00ffff 180deg, #0000ff 240deg, #ff00ff 300deg, #ff0000 360deg)'
+                  }}
+                  title="Custom Color"
+                  aria-label="Custom Color Spectrum"
+                >
+                  {/* Selected Custom Color Indicator Dot */}
+                  {!BRUSH_COLORS.includes(currentColor) && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
+                  )}
+                </button>
+                <input
+                  type="color"
+                  id="gradient-color-input"
+                  value={currentColor}
+                  onChange={(e) => {
+                    setCurrentColor(e.target.value);
+                    if (currentTool === 'fill') {
+                      // Keep fill tool
+                    } else if (currentColor === '#ffffff') {
+                      setCurrentTool('brush');
+                    }
+                  }}
+                  className="sr-only absolute w-0 h-0 opacity-0"
+                />
+              </div>
+            </div>
+
+            {/* Right: Board Commands (Undo / Clear Canvas) */}
+            <div className="flex items-center gap-2" id="canvas-actions-bar">
+              <button
+                onClick={onUndoStroke}
+                className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
+                title="Undo last stroke"
+                aria-label="Undo last stroke"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline">UNDO</span>
+              </button>
+              <button
+                onClick={onClearCanvas}
+                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-100 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
+                title="Clear Board"
+                aria-label="Clear drawing canvas"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline text-red-650">CLEAR</span>
+              </button>
+            </div>
+          </div>
+
+          {/* ROW 2: Tools + Brush Sizes */}
+          <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap border-t border-slate-200/60 pt-2">
             
             {/* Left: Unified Tools Segmented Control */}
             <div className="flex items-center bg-white border border-slate-200/80 rounded-xl p-1 gap-1 shadow-2xs" id="drawing-tools-switcher">
@@ -587,96 +677,6 @@ export default function DrawingCanvas({
               >
                 <Eraser className="w-3.5 h-3.5" />
               </button>
-            </div>
-
-            {/* Right: Board Commands (Undo / Clear Canvas) */}
-            <div className="flex items-center gap-2" id="canvas-actions-bar">
-              <button
-                onClick={onUndoStroke}
-                className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
-                title="Undo last stroke"
-                aria-label="Undo last stroke"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">UNDO</span>
-              </button>
-              <button
-                onClick={onClearCanvas}
-                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-100 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
-                title="Clear Board"
-                aria-label="Clear drawing canvas"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline text-red-650">CLEAR</span>
-              </button>
-            </div>
-          </div>
-
-          {/* ROW 2: Style Attributes (Colors Palette + Brush Sizes) */}
-          <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap border-t border-slate-200/60 pt-2">
-            
-            {/* Left: Swatches selection grid */}
-            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 px-2" id="color-palette-selection">
-              {BRUSH_COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => {
-                    setCurrentColor(color);
-                    if (color === '#ffffff') {
-                      setCurrentTool('brush');
-                    }
-                  }}
-                  style={{ backgroundColor: color }}
-                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center ${
-                    currentColor === color
-                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
-                      : 'border-slate-200 hover:scale-110 hover:shadow-2xs'
-                  }`}
-                  title={color === '#ffffff' ? 'Eraser Color' : `Color ${color}`}
-                  aria-label={`Select ${color === '#ffffff' ? 'eraser' : `color ${color}`}`}
-                >
-                  {/* Selected Color Indicator Dot */}
-                  {currentColor === color && (
-                    <span className={`w-1.5 h-1.5 rounded-full ${color === '#ffffff' ? 'bg-slate-600' : 'bg-white'} shadow-xs`} />
-                  )}
-                </button>
-              ))}
-
-              {/* Beautiful Custom Color Gradient Picker */}
-              <div className="relative flex items-center justify-center shrink-0">
-                <button
-                  onClick={() => document.getElementById('gradient-color-input')?.click()}
-                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
-                    !BRUSH_COLORS.includes(currentColor)
-                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
-                      : 'border-slate-200 shadow-3xs'
-                  }`}
-                  style={{
-                    background: 'conic-gradient(from 180deg at 50% 50%, #ff0000 0deg, #ffff00 60deg, #00ff00 120deg, #00ffff 180deg, #0000ff 240deg, #ff00ff 300deg, #ff0000 360deg)'
-                  }}
-                  title="Custom Color"
-                  aria-label="Custom Color Spectrum"
-                >
-                  {/* Selected Custom Color Indicator Dot */}
-                  {!BRUSH_COLORS.includes(currentColor) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
-                  )}
-                </button>
-                <input
-                  type="color"
-                  id="gradient-color-input"
-                  value={currentColor}
-                  onChange={(e) => {
-                    setCurrentColor(e.target.value);
-                    if (currentTool === 'fill') {
-                      // Keep fill tool
-                    } else if (currentColor === '#ffffff') {
-                      setCurrentTool('brush');
-                    }
-                  }}
-                  className="sr-only absolute w-0 h-0 opacity-0"
-                />
-              </div>
             </div>
 
             {/* Right: Brush Sizing Segment controller */}

@@ -23,7 +23,7 @@ try { fs.writeFileSync(logFile, ''); } catch (e) {}
 
 const app = express();
 const server = http.createServer(app);
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 // Standard health API
 app.get('/api/health', (req, res) => {

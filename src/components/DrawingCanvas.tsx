@@ -468,200 +468,220 @@ export default function DrawingCanvas({
     <div className="flex flex-col h-full gap-2 sm:gap-3" id="canvas-container-root">
       {/* Interactive drawing utility panel (Only displayed for drawer when not in PiP mode) */}
       {isDrawer && !isPip && (
-        <div className="flex flex-row flex-wrap items-center justify-between gap-1.5 p-1.5 bg-white border border-slate-200 rounded-xl shadow-xs animate-fade-in text-slate-700 w-full" id="canvas-palette-bar">
+        <div className="flex flex-col gap-2 p-2 bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs text-slate-700 w-full animate-fade-in" id="canvas-palette-bar">
           
-          {/* Group 1: Tools & Shapes Switcher */}
-          <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-0.5 gap-0.5 shrink-0" id="drawing-tools-switcher">
-            <button
-              onClick={() => {
-                setCurrentTool('brush');
-                if (currentColor === '#ffffff') {
-                  // Switch back to black if they were erasing, to make painting natural
-                  setCurrentColor('#000000');
-                }
-              }}
-              className={`p-1 sm:p-1.5 rounded-md transition-all cursor-pointer ${
-                currentTool === 'brush' && currentColor !== '#ffffff'
-                  ? 'bg-brand-primary text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-              }`}
-              title="Pencil / Freehand Brush"
-              aria-label="Brush tool"
-            >
-              <Paintbrush className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => {
-                setCurrentTool('line');
-                if (currentColor === '#ffffff') setCurrentColor('#000000');
-              }}
-              className={`p-1 sm:p-1.5 rounded-md transition-all cursor-pointer ${
-                currentTool === 'line'
-                  ? 'bg-brand-primary text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-              }`}
-              title="Draw Straight Line"
-              aria-label="Line tool"
-            >
-              <Minus className="w-3.5 h-3.5 rotate-45" />
-            </button>
-            <button
-              onClick={() => {
-                setCurrentTool('rect');
-                if (currentColor === '#ffffff') setCurrentColor('#000000');
-              }}
-              className={`p-1 sm:p-1.5 rounded-md transition-all cursor-pointer ${
-                currentTool === 'rect'
-                  ? 'bg-brand-primary text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-              }`}
-              title="Draw Rectangle"
-              aria-label="Rectangle tool"
-            >
-              <Square className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => {
-                setCurrentTool('circle');
-                if (currentColor === '#ffffff') setCurrentColor('#000000');
-              }}
-              className={`p-1 sm:p-1.5 rounded-md transition-all cursor-pointer ${
-                currentTool === 'circle'
-                  ? 'bg-brand-primary text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-              }`}
-              title="Draw Circle"
-              aria-label="Circle tool"
-            >
-              <Circle className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => {
-                setCurrentTool('fill');
-                if (currentColor === '#ffffff') setCurrentColor('#000000');
-              }}
-              className={`p-1 sm:p-1.5 rounded-md transition-all cursor-pointer ${
-                currentTool === 'fill'
-                  ? 'bg-brand-primary text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-              }`}
-              title="Paint Bucket (Flood Fill Area)"
-              aria-label="Paint bucket fill tool"
-            >
-              <PaintBucket className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => {
-                setCurrentTool('brush');
-                setCurrentColor('#ffffff'); // white acts as eraser
-              }}
-              className={`p-1 sm:p-1.5 rounded-md transition-all cursor-pointer ${
-                currentColor === '#ffffff' && currentTool === 'brush'
-                  ? 'bg-brand-primary text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-              }`}
-              title="Eraser Tool"
-              aria-label="Eraser tool"
-            >
-              <Eraser className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Group 2: Colors Picker */}
-          <div className="flex items-center gap-1 shrink-0" id="color-palette-selection">
-            {BRUSH_COLORS.map((color) => (
+          {/* ROW 1: Action Inputs (Tools + Board Commands) */}
+          <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap">
+            
+            {/* Left: Unified Tools Segmented Control */}
+            <div className="flex items-center bg-white border border-slate-200/80 rounded-xl p-1 gap-1 shadow-2xs" id="drawing-tools-switcher">
               <button
-                key={color}
                 onClick={() => {
-                  setCurrentColor(color);
-                  if (color === '#ffffff') {
-                    setCurrentTool('brush');
+                  setCurrentTool('brush');
+                  if (currentColor === '#ffffff') {
+                    setCurrentColor('#000000');
                   }
                 }}
-                style={{ backgroundColor: color }}
-                className={`w-4.5 h-4.5 sm:w-5.5 sm:h-5.5 rounded-full border border-slate-200 shadow-3xs transition-all active:scale-90 cursor-pointer ${
-                  currentColor === color ? 'ring-2 ring-brand-primary ring-offset-1 ring-offset-white scale-110 z-10' : 'hover:scale-105'
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  currentTool === 'brush' && currentColor !== '#ffffff'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
                 }`}
-                title={color === '#ffffff' ? 'Eraser Color' : `Color ${color}`}
-                aria-label={`Select ${color === '#ffffff' ? 'eraser' : `color ${color}`}`}
-              />
-            ))}
-
-            {/* Beautiful Custom Color Gradient Picker */}
-            <div className="relative flex items-center justify-center shrink-0">
+                title="Pencil / Freehand Brush"
+                aria-label="Brush tool"
+              >
+                <Paintbrush className="w-3.5 h-3.5" />
+              </button>
               <button
-                onClick={() => document.getElementById('gradient-color-input')?.click()}
-                className={`w-4.5 h-4.5 sm:w-5.5 sm:h-5.5 rounded-full border border-slate-200 transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
-                  !BRUSH_COLORS.includes(currentColor) ? 'ring-2 ring-brand-primary ring-offset-1 ring-offset-white scale-110 shadow-xs z-10' : 'shadow-3xs'
+                onClick={() => {
+                  setCurrentTool('line');
+                  if (currentColor === '#ffffff') setCurrentColor('#000000');
+                }}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  currentTool === 'line'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
                 }`}
-                style={{
-                  background: 'conic-gradient(from 180deg at 50% 50%, #ff0000 0deg, #ffff00 60deg, #00ff00 120deg, #00ffff 180deg, #0000ff 240deg, #ff00ff 300deg, #ff0000 360deg)'
+                title="Draw Straight Line"
+                aria-label="Line tool"
+              >
+                <Minus className="w-3.5 h-3.5 rotate-45" />
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentTool('rect');
+                  if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                title="Custom Color"
-                aria-label="Custom Color Spectrum"
-              />
-              <input
-                type="color"
-                id="gradient-color-input"
-                value={currentColor}
-                onChange={(e) => {
-                  setCurrentColor(e.target.value);
-                  if (currentTool === 'fill') {
-                    // Keep fill tool
-                  } else if (currentColor === '#ffffff') {
-                    setCurrentTool('brush');
-                  }
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  currentTool === 'rect'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
+                title="Draw Rectangle"
+                aria-label="Rectangle tool"
+              >
+                <Square className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentTool('circle');
+                  if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className="sr-only absolute w-0 h-0 opacity-0"
-              />
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  currentTool === 'circle'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
+                title="Draw Circle"
+                aria-label="Circle tool"
+              >
+                <Circle className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentTool('fill');
+                  if (currentColor === '#ffffff') setCurrentColor('#000000');
+                }}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  currentTool === 'fill'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
+                title="Paint Bucket (Flood Fill Area)"
+                aria-label="Paint bucket fill tool"
+              >
+                <PaintBucket className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentTool('brush');
+                  setCurrentColor('#ffffff'); // white acts as eraser
+                }}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  currentColor === '#ffffff' && currentTool === 'brush'
+                    ? 'bg-brand-primary text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
+                title="Eraser Tool"
+                aria-label="Eraser tool"
+              >
+                <Eraser className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Right: Board Commands (Undo / Clear Canvas) */}
+            <div className="flex items-center gap-2" id="canvas-actions-bar">
+              <button
+                onClick={onUndoStroke}
+                className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
+                title="Undo last stroke"
+                aria-label="Undo last stroke"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline">UNDO</span>
+              </button>
+              <button
+                onClick={onClearCanvas}
+                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-100 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
+                title="Clear Board"
+                aria-label="Clear drawing canvas"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline text-red-650">CLEAR</span>
+              </button>
             </div>
           </div>
 
-          {/* Group 3: Brush Sizes (Pointer pixel size segmented picker) */}
-          <div className="flex items-center gap-1 shrink-0" id="brush-size-selection">
-            {currentTool !== 'fill' ? (
-              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-0.5 gap-0.5" id="size-segmented-control">
-                {BRUSH_SIZES.map((size) => {
-                  return (
-                    <button
-                      key={size.value}
-                      onClick={() => setCurrentSize(size.value)}
-                      className={`px-1.5 sm:px-2 py-0.5 text-[9px] font-extrabold uppercase rounded-md transition-all cursor-pointer ${
-                        currentSize === size.value
-                          ? 'bg-brand-primary text-white shadow-xs'
-                          : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                      aria-label={`Brush size ${size.value} pixels`}
-                      title={`Size ${size.value}px`}
-                    >
-                      {`${size.value}px`}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider px-1">FILL MODE</span>
-            )}
-          </div>
+          {/* ROW 2: Style Attributes (Colors Palette + Brush Sizes) */}
+          <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap border-t border-slate-200/60 pt-2">
+            
+            {/* Left: Swatches selection grid */}
+            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5" id="color-palette-selection">
+              {BRUSH_COLORS.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => {
+                    setCurrentColor(color);
+                    if (color === '#ffffff') {
+                      setCurrentTool('brush');
+                    }
+                  }}
+                  style={{ backgroundColor: color }}
+                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border border-slate-200 shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center ${
+                    currentColor === color ? 'ring-2 ring-brand-primary ring-offset-1 ring-offset-white scale-110 z-10' : 'hover:scale-105'
+                  }`}
+                  title={color === '#ffffff' ? 'Eraser Color' : `Color ${color}`}
+                  aria-label={`Select ${color === '#ffffff' ? 'eraser' : `color ${color}`}`}
+                >
+                  {/* Selected Color Indicator Dot */}
+                  {currentColor === color && (
+                    <span className={`w-1.5 h-1.5 rounded-full ${color === '#ffffff' ? 'bg-slate-600' : 'bg-white'} shadow-xs`} />
+                  )}
+                </button>
+              ))}
 
-          {/* Group 4: Board Controls (Spaced out with visible borders on mobile to prevent mistouches) */}
-          <div className="flex items-center gap-3 sm:gap-1.5 shrink-0" id="canvas-actions-bar">
-            <button
-              onClick={onUndoStroke}
-              className="p-2 sm:p-1.5 text-slate-500 hover:text-brand-primary hover:bg-slate-100/70 border border-slate-200/60 rounded-xl sm:rounded-lg transition-all cursor-pointer bg-white sm:border-0 sm:bg-transparent shadow-xs sm:shadow-none"
-              title="Undo last stroke"
-              aria-label="Undo last stroke"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={onClearCanvas}
-              className="p-2 sm:p-1.5 text-red-500 hover:text-red-650 hover:bg-red-50/50 border border-red-200/50 rounded-xl sm:rounded-lg transition-all cursor-pointer bg-white sm:border-0 sm:bg-transparent shadow-xs sm:shadow-none"
-              title="Clear Board"
-              aria-label="Clear drawing canvas"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+              {/* Beautiful Custom Color Gradient Picker */}
+              <div className="relative flex items-center justify-center shrink-0">
+                <button
+                  onClick={() => document.getElementById('gradient-color-input')?.click()}
+                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border border-slate-200 transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
+                    !BRUSH_COLORS.includes(currentColor) ? 'ring-2 ring-brand-primary ring-offset-1 ring-offset-white scale-110 shadow-xs z-10' : 'shadow-3xs'
+                  }`}
+                  style={{
+                    background: 'conic-gradient(from 180deg at 50% 50%, #ff0000 0deg, #ffff00 60deg, #00ff00 120deg, #00ffff 180deg, #0000ff 240deg, #ff00ff 300deg, #ff0000 360deg)'
+                  }}
+                  title="Custom Color"
+                  aria-label="Custom Color Spectrum"
+                >
+                  {/* Selected Custom Color Indicator Dot */}
+                  {!BRUSH_COLORS.includes(currentColor) && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
+                  )}
+                </button>
+                <input
+                  type="color"
+                  id="gradient-color-input"
+                  value={currentColor}
+                  onChange={(e) => {
+                    setCurrentColor(e.target.value);
+                    if (currentTool === 'fill') {
+                      // Keep fill tool
+                    } else if (currentColor === '#ffffff') {
+                      setCurrentTool('brush');
+                    }
+                  }}
+                  className="sr-only absolute w-0 h-0 opacity-0"
+                />
+              </div>
+            </div>
+
+            {/* Right: Brush Sizing Segment controller */}
+            <div className="flex items-center gap-1 shrink-0" id="brush-size-selection">
+              {currentTool !== 'fill' ? (
+                <div className="flex items-center bg-slate-200/50 border border-slate-250/70 rounded-xl p-0.5 gap-0.5 shadow-3xs" id="size-segmented-control">
+                  {BRUSH_SIZES.map((size) => {
+                    return (
+                      <button
+                        key={size.value}
+                        onClick={() => setCurrentSize(size.value)}
+                        className={`px-2.5 py-0.5 text-[9px] font-black uppercase rounded-lg transition-all cursor-pointer ${
+                          currentSize === size.value
+                            ? 'bg-brand-primary text-white shadow-sm'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                        aria-label={`Brush size ${size.value} pixels`}
+                        title={`Size ${size.value}px`}
+                      >
+                        {`${size.value}px`}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider px-1 bg-slate-100 rounded-lg py-0.5 border border-slate-200">FILL MODE</span>
+              )}
+            </div>
+
           </div>
 
         </div>

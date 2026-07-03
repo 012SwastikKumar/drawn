@@ -1237,6 +1237,39 @@ export default function App() {
                 </span>
               </div>
 
+              {/* DESKTOP/TABLET ONLY: Integrated Chat Sidebar Leaderboard (Always visible on laptop/tablet viewports) */}
+              <div className="hidden sm:block bg-slate-50 border-b border-slate-200/80 p-2.5 select-none" id="chat-sidebar-leaderboard">
+                <span className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                  Live Rankings
+                </span>
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+                  {(Object.values(room.players) as Player[])
+                    .sort((a, b) => {
+                      if (b.score !== a.score) return b.score - a.score;
+                      return a.name.localeCompare(b.name);
+                    })
+                    .map((p) => {
+                      const isSelf = p.id === playerId;
+                      const higherScoringCount = (Object.values(room.players) as Player[]).filter((other) => other.score > p.score).length;
+                      const rank = higherScoringCount + 1;
+                      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                      return (
+                        <div
+                          key={p.id}
+                          className={`flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[9px] border shrink-0 ${
+                            isSelf ? 'bg-indigo-50 border-indigo-200 font-extrabold' : 'bg-white border-slate-200'
+                          } ${p.disconnected ? 'opacity-55' : ''}`}
+                        >
+                          <span>{medal}</span>
+                          <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+                          <span className="truncate max-w-[50px] uppercase tracking-wide leading-none">{p.name}</span>
+                          <span className="font-mono font-black text-indigo-650 leading-none">{p.score}</span>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
               {/* Chat history list */}
               <div className="flex-1 p-3 overflow-y-auto space-y-3 text-xs bg-slate-50/40" id="chat-history-log">
                 {messages.length === 0 ? (

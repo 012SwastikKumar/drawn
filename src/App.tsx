@@ -807,72 +807,15 @@ export default function App() {
             )}
 
             {/* Header control triggers */}
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-2">
               
-              {/* DESKTOP-ONLY HEADER CONTROLS */}
-              <div className="hidden sm:flex items-center gap-2" id="desktop-header-controls">
-                {player?.isHost && room.status !== 'LOBBY' && (
-                  <button
-                    onClick={() => setShowHostSettings(true)}
-                    className="h-9 px-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-black text-white border border-indigo-700 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-xs shrink-0"
-                    title="Open Host Settings Panel"
-                    id="host-settings-trigger-btn"
-                  >
-                    <Settings className="w-4 h-4 text-white" />
-                    <span>HOST PANEL</span>
-                  </button>
-                )}
-                <button
-                  onClick={toggleSound}
-                  className="h-9 px-4 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-xs shrink-0"
-                  title={soundEnabled ? 'Mute game sounds' : 'Unmute game sounds'}
-                  id="toggle-game-sounds-btn"
-                >
-                  {soundEnabled ? (
-                    <>
-                      <Volume2 className="w-4 h-4 text-emerald-600 animate-pulse" />
-                      <span className="text-slate-700">SOUND: ON</span>
-                    </>
-                  ) : (
-                    <>
-                      <VolumeX className="w-4 h-4 text-slate-400" />
-                      <span className="text-slate-400">SOUND: OFF</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => setShowScoringRules(true)}
-                  className="h-9 px-4 bg-amber-50 hover:bg-amber-100 rounded-xl text-xs font-bold border border-amber-200 text-amber-700 transition-all items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
-                  title="View Transparent Scoring Rules"
-                  id="scoring-rules-trigger-btn"
-                >
-                  <Award className="w-4 h-4 text-amber-600" />
-                  <span>SCORING RULES</span>
-                </button>
-                <button
-                  onClick={copyInviteLink}
-                  className="inline-flex h-9 px-4 bg-white hover:bg-slate-50 rounded-xl text-xs font-bold border border-slate-200 text-slate-700 transition-all items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
-                  title="Copy Shared Invite Link"
-                >
-                  {copiedLink ? <Check className="w-4 h-4 text-emerald-600 animate-pulse" /> : <Copy className="w-4 h-4 text-indigo-600" />}
-                  <span>INVITE LINK</span>
-                </button>
-                <button
-                  onClick={handleLeaveRoom}
-                  className="h-9 px-4 bg-red-600 hover:bg-red-700 rounded-xl text-xs font-black text-white border border-red-755 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-xs shrink-0"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>LEAVE</span>
-                </button>
-              </div>
-
-              {/* MOBILE-ONLY OPTION DROPDOWN MENU */}
-              <div className="relative sm:hidden" id="mobile-header-options">
+              {/* UNIFIED OPTIONS DROPDOWN MENU (Consolidated for both mobile and widescreen/laptop views) */}
+              <div className="relative" id="header-options-dropdown">
                 <button
                   onClick={() => setShowMobileMenu(!showMobileMenu)}
                   className="w-9 h-9 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 text-slate-650 flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all"
                   title="Open options menu"
-                  id="mobile-options-menu-btn"
+                  id="options-menu-btn"
                 >
                   <MoreVertical className="w-4.5 h-4.5" />
                 </button>

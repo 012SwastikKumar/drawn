@@ -758,8 +758,15 @@ export default function App() {
           {/* Top Elegant Navigation Panel */}
           <header className="h-16 flex-none bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shadow-xs" id="game-header-bar">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center" id="header-brand-logo">
-                <DrawnLogo showTagline={false} animated={true} className="h-12 w-28 sm:w-32 -my-2" />
+              <div className="flex items-center gap-1.5" id="header-brand-logo">
+                <img
+                  src="/header-logo.png"
+                  alt="Drawn Logo"
+                  className="h-10 w-10 rounded-xl object-contain shadow-xs border border-slate-100 animate-fade-in hover:scale-105 transition-transform select-none pointer-events-none"
+                />
+                <span className="text-base font-black tracking-widest text-slate-800 font-sans hidden xs:inline uppercase bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent select-none">
+                  DRAWN
+                </span>
               </div>
               <div className="hidden sm:flex border-l border-slate-200 pl-3 h-8 flex-col justify-center">
                 <p className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider leading-none mb-1">

@@ -609,8 +609,8 @@ export default function DrawingCanvas({
           {/* ROW 1: Colors Palette + Board Commands */}
           <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap">
             
-            {/* Left: Swatches selection grid (Enlarged for touch accessibility) */}
-            <div className="flex items-center gap-2 overflow-x-auto py-1 px-2 scrollbar-none" id="color-palette-selection">
+            {/* Left: Swatches selection grid (Standard Compact Size) */}
+            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 px-2 scrollbar-none" id="color-palette-selection">
               {BRUSH_COLORS.map((color) => (
                 <button
                   key={color}
@@ -621,9 +621,9 @@ export default function DrawingCanvas({
                     }
                   }}
                   style={{ backgroundColor: color }}
-                  className={`w-6 h-6 sm:w-7.5 sm:h-7.5 rounded-full border shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center shrink-0 ${
+                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border shadow-3xs transition-all active:scale-90 cursor-pointer flex items-center justify-center shrink-0 ${
                     currentColor === color
-                      ? 'scale-115 border-2 border-slate-750 shadow-md z-10'
+                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
                       : 'border-slate-200 hover:scale-110 hover:shadow-2xs'
                   }`}
                   title={color === '#ffffff' ? 'Eraser Color' : `Color ${color}`}
@@ -631,7 +631,7 @@ export default function DrawingCanvas({
                 >
                   {/* Selected Color Indicator Dot */}
                   {currentColor === color && (
-                    <span className={`w-2 h-2 rounded-full ${color === '#ffffff' ? 'bg-slate-600' : 'bg-white'} shadow-xs`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${color === '#ffffff' ? 'bg-slate-600' : 'bg-white'} shadow-xs`} />
                   )}
                 </button>
               ))}
@@ -640,9 +640,9 @@ export default function DrawingCanvas({
               <div className="relative flex items-center justify-center shrink-0">
                 <button
                   onClick={() => document.getElementById('gradient-color-input')?.click()}
-                  className={`w-6 h-6 sm:w-7.5 sm:h-7.5 rounded-full border transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
+                  className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full border transition-all active:scale-90 cursor-pointer hover:scale-110 flex items-center justify-center ${
                     !BRUSH_COLORS.includes(currentColor)
-                      ? 'scale-115 border-2 border-slate-750 shadow-md z-10'
+                      ? 'scale-125 border-2 border-slate-750 shadow-md z-10'
                       : 'border-slate-200 shadow-3xs'
                   }`}
                   style={{
@@ -653,7 +653,7 @@ export default function DrawingCanvas({
                 >
                   {/* Selected Custom Color Indicator Dot */}
                   {!BRUSH_COLORS.includes(currentColor) && (
-                    <span className="w-2 h-2 rounded-full bg-white shadow-xs" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
                   )}
                 </button>
                 <input
@@ -673,34 +673,34 @@ export default function DrawingCanvas({
               </div>
             </div>
 
-            {/* Right: Board Commands (Undo / Clear Canvas) (Enlarged) */}
-            <div className="flex items-center gap-2.5" id="canvas-actions-bar">
+            {/* Right: Board Commands (Undo / Clear Canvas) (Standard Compact Size) */}
+            <div className="flex items-center gap-2" id="canvas-actions-bar">
               <button
                 onClick={onUndoStroke}
-                className="p-2 sm:p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1.5 text-xs font-black px-3.5 active:scale-95"
+                className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
                 title="Undo last stroke"
                 aria-label="Undo last stroke"
               >
-                <RotateCcw className="w-4.5 h-4.5" />
+                <RotateCcw className="w-3.5 h-3.5" />
                 <span className="hidden xs:inline">UNDO</span>
               </button>
               <button
                 onClick={onClearCanvas}
-                className="p-2 sm:p-2.5 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-100 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1.5 text-xs font-black px-3.5 active:scale-95"
+                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-100 bg-white rounded-xl transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 active:scale-95"
                 title="Clear Board"
                 aria-label="Clear drawing canvas"
               >
-                <Trash2 className="w-4.5 h-4.5" />
+                <Trash2 className="w-3.5 h-3.5" />
                 <span className="hidden xs:inline text-red-650">CLEAR</span>
               </button>
             </div>
           </div>
 
           {/* ROW 2: Tools + Brush Sizes */}
-          <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap border-t border-slate-200/60 pt-2.5">
+          <div className="flex items-center justify-between gap-3 w-full flex-wrap sm:flex-nowrap border-t border-slate-200/60 pt-2">
             
-            {/* Left: Unified Tools Segmented Control (Enlarged with Arrow, Triangle, Star, Diamond) */}
-            <div className="flex items-center bg-white border border-slate-200/80 rounded-2xl p-1 gap-1 shadow-2xs overflow-x-auto scrollbar-none max-w-[70%] sm:max-w-none" id="drawing-tools-switcher">
+            {/* Left: Unified Tools Segmented Control (Enlarged ONLY for mobile thumb viewports) */}
+            <div className="flex items-center bg-white border border-slate-200/80 rounded-xl p-1 gap-1 shadow-2xs overflow-x-auto scrollbar-none max-w-[70%] sm:max-w-none" id="drawing-tools-switcher">
               <button
                 onClick={() => {
                   setCurrentTool('brush');
@@ -708,7 +708,7 @@ export default function DrawingCanvas({
                     setCurrentColor('#000000');
                   }
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'brush' && currentColor !== '#ffffff'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -716,14 +716,14 @@ export default function DrawingCanvas({
                 title="Pencil / Freehand Brush"
                 aria-label="Brush tool"
               >
-                <Pencil className="w-5 h-5" />
+                <Pencil className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('line');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'line'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -731,14 +731,14 @@ export default function DrawingCanvas({
                 title="Draw Straight Line"
                 aria-label="Line tool"
               >
-                <Minus className="w-5 h-5 rotate-45" />
+                <Minus className="w-5 h-5 sm:w-3.5 sm:h-3.5 rotate-45" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('arrow');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'arrow'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -746,14 +746,14 @@ export default function DrawingCanvas({
                 title="Draw Arrow"
                 aria-label="Arrow tool"
               >
-                <ArrowUpRight className="w-5 h-5" />
+                <ArrowUpRight className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('rect');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'rect'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -761,14 +761,14 @@ export default function DrawingCanvas({
                 title="Draw Rectangle"
                 aria-label="Rectangle tool"
               >
-                <Square className="w-5 h-5" />
+                <Square className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('circle');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'circle'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -776,14 +776,14 @@ export default function DrawingCanvas({
                 title="Draw Circle"
                 aria-label="Circle tool"
               >
-                <Circle className="w-5 h-5" />
+                <Circle className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('triangle');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'triangle'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -791,14 +791,14 @@ export default function DrawingCanvas({
                 title="Draw Triangle"
                 aria-label="Triangle tool"
               >
-                <Triangle className="w-5 h-5" />
+                <Triangle className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('star');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'star'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -806,14 +806,14 @@ export default function DrawingCanvas({
                 title="Draw Star"
                 aria-label="Star tool"
               >
-                <Star className="w-5 h-5" />
+                <Star className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('diamond');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'diamond'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -821,14 +821,14 @@ export default function DrawingCanvas({
                 title="Draw Diamond"
                 aria-label="Diamond tool"
               >
-                <Diamond className="w-5 h-5" />
+                <Diamond className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('fill');
                   if (currentColor === '#ffffff') setCurrentColor('#000000');
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentTool === 'fill'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -836,14 +836,14 @@ export default function DrawingCanvas({
                 title="Paint Bucket (Flood Fill Area)"
                 aria-label="Paint bucket fill tool"
               >
-                <PaintBucket className="w-5 h-5" />
+                <PaintBucket className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => {
                   setCurrentTool('brush');
                   setCurrentColor('#ffffff'); // white acts as eraser
                 }}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all cursor-pointer shrink-0 ${
+                className={`p-2.5 sm:p-1.5 rounded-xl sm:rounded-lg transition-all cursor-pointer shrink-0 ${
                   currentColor === '#ffffff' && currentTool === 'brush'
                     ? 'bg-brand-primary text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -851,20 +851,20 @@ export default function DrawingCanvas({
                 title="Eraser Tool"
                 aria-label="Eraser tool"
               >
-                <Eraser className="w-5 h-5" />
+                <Eraser className="w-5 h-5 sm:w-3.5 sm:h-3.5" />
               </button>
             </div>
 
-            {/* Right: Brush Sizing Segment controller (Enlarged) */}
+            {/* Right: Brush Sizing Segment controller (Standard Compact Size) */}
             <div className="flex items-center gap-1 shrink-0" id="brush-size-selection">
               {currentTool !== 'fill' ? (
-                <div className="flex items-center bg-slate-200/50 border border-slate-250/70 rounded-2xl p-1 gap-1 shadow-3xs" id="size-segmented-control">
+                <div className="flex items-center bg-slate-200/50 border border-slate-250/70 rounded-xl p-0.5 gap-0.5 shadow-3xs" id="size-segmented-control">
                   {BRUSH_SIZES.map((size) => {
                     return (
                       <button
                         key={size.value}
                         onClick={() => setCurrentSize(size.value)}
-                        className={`px-3.5 py-1 text-xs font-black uppercase rounded-xl transition-all cursor-pointer ${
+                        className={`px-2.5 py-0.5 text-[9px] font-black uppercase rounded-lg transition-all cursor-pointer ${
                           currentSize === size.value
                             ? 'bg-brand-primary text-white shadow-sm'
                             : 'text-slate-500 hover:text-slate-800'
@@ -878,7 +878,7 @@ export default function DrawingCanvas({
                   })}
                 </div>
               ) : (
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2 bg-slate-100 rounded-xl py-1.5 border border-slate-200">FILL MODE</span>
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider px-1 bg-slate-100 rounded-lg py-0.5 border border-slate-200">FILL MODE</span>
               )}
             </div>
 

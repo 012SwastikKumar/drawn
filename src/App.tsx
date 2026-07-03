@@ -1030,16 +1030,26 @@ export default function App() {
                   <div className="w-full max-w-sm space-y-2" id="round-scores-list">
                     <span className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest text-center mb-3">Round Points Gained</span>
                     {(Object.values(room.players) as Player[])
-                      .sort((a, b) => b.roundScore - a.roundScore)
-                      .map((p) => (
-                        <div
-                          key={p.id}
-                          className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-150 rounded-xl text-xs shadow-xs"
-                        >
-                          <span className="font-extrabold text-slate-700">{p.name}</span>
-                          <span className="font-black text-emerald-600">+{p.roundScore} PTS</span>
-                        </div>
-                      ))}
+                      .sort((a, b) => {
+                        if (b.score !== a.score) return b.score - a.score;
+                        return a.name.localeCompare(b.name);
+                      })
+                      .map((p) => {
+                        const higherScoringCount = (Object.values(room.players) as Player[]).filter((other) => other.score > p.score).length;
+                        const rank = higherScoringCount + 1;
+                        return (
+                          <div
+                            key={p.id}
+                            className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-150 rounded-xl text-xs shadow-xs"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-slate-450">#{rank}</span>
+                              <span className="font-extrabold text-slate-700">{p.name}</span>
+                            </div>
+                            <span className="font-black text-emerald-600">+{p.roundScore} PTS</span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               )}
@@ -1067,19 +1077,26 @@ export default function App() {
                   {/* Roster list */}
                   <div className="w-full max-w-sm space-y-2 mb-6" id="final-leaderboard-list">
                     {(Object.values(room.players) as Player[])
-                      .sort((a, b) => b.score - a.score)
-                      .map((p, idx) => (
-                        <div
-                          key={p.id}
-                          className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-150 rounded-xl text-xs shadow-xs"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="font-extrabold text-slate-400">#{idx + 1}</span>
-                            <span className="font-extrabold text-slate-700">{p.name}</span>
+                      .sort((a, b) => {
+                        if (b.score !== a.score) return b.score - a.score;
+                        return a.name.localeCompare(b.name);
+                      })
+                      .map((p) => {
+                        const higherScoringCount = (Object.values(room.players) as Player[]).filter((other) => other.score > p.score).length;
+                        const rank = higherScoringCount + 1;
+                        return (
+                          <div
+                            key={p.id}
+                            className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-150 rounded-xl text-xs shadow-xs"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-slate-400">#{rank}</span>
+                              <span className="font-extrabold text-slate-700">{p.name}</span>
+                            </div>
+                            <span className="font-black text-indigo-600">{p.score} PTS</span>
                           </div>
-                          <span className="font-black text-indigo-600">{p.score} PTS</span>
-                        </div>
-                      ))}
+                        );
+                      })}
                   </div>
 
                   {/* Rematch & action buttons */}

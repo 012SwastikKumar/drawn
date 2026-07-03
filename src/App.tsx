@@ -269,6 +269,7 @@ export default function App() {
             case 'join_success': {
               const { roomId: newRoomId, player: me, room: initialRoom, strokes: initialStrokes } = msg.payload;
               setRoomId(newRoomId);
+              setPlayerId(me.id);
               setPlayer(me);
               setRoom(initialRoom);
               setStrokes(initialStrokes || []);

@@ -407,15 +407,15 @@ export default function AudioVideoRoom({
       <div className="flex gap-2 sm:gap-3 overflow-x-auto py-0.5 px-0.5 scrollbar-thin select-none scroll-smooth min-w-0 items-center" id="players-stream-grid">
         
         {/* Media Active Dashboard Control Hub (Sleek, inline space-saving controller) */}
-        <div className="flex flex-col items-center justify-center p-1.5 sm:p-2 bg-white border border-slate-200 rounded-xl shrink-0 gap-1.5 w-14 sm:w-16 h-24 sm:h-30 shadow-xs" id="media-panel-header">
+        <div className="flex flex-col items-center justify-center p-1.5 sm:p-2 bg-white border border-slate-200 rounded-xl shrink-0 gap-1.5 w-14 sm:w-15 h-24 shadow-xs" id="media-panel-header">
           <span className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest block text-center leading-none select-none">
             MEDIA
           </span>
-          <div className="flex flex-col items-center gap-1.5 sm:gap-2 w-full" id="local-media-triggers">
+          <div className="flex flex-col items-center gap-1.5 w-full" id="local-media-triggers">
             <button
               onClick={toggleMic}
               disabled={!hasMic}
-              className={`w-7 h-7 sm:w-8 h-8 rounded-full border transition-all cursor-pointer flex items-center justify-center ${
+              className={`w-7 h-7 rounded-full border transition-all cursor-pointer flex items-center justify-center ${
                 isMuted
                   ? 'bg-red-50 border-red-200 text-brand-error hover:bg-red-100 shadow-inner'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 shadow-xs'
@@ -423,13 +423,13 @@ export default function AudioVideoRoom({
               title={isMuted ? 'Unmute Mic' : 'Mute Mic'}
               aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
             >
-              {isMuted ? <MicOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+              {isMuted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
             </button>
 
             <button
               onClick={toggleCamera}
               disabled={!hasCamera}
-              className={`w-7 h-7 sm:w-8 h-8 rounded-full border transition-all cursor-pointer flex items-center justify-center ${
+              className={`w-7 h-7 rounded-full border transition-all cursor-pointer flex items-center justify-center ${
                 isVideoOff
                   ? 'bg-red-50 border-red-200 text-brand-error hover:bg-red-100 shadow-inner'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 shadow-xs'
@@ -437,7 +437,7 @@ export default function AudioVideoRoom({
               title={isVideoOff ? 'Enable Camera' : 'Disable Camera'}
               aria-label={isVideoOff ? 'Turn camera on' : 'Turn camera off'}
             >
-              {isVideoOff ? <VideoOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+              {isVideoOff ? <VideoOff className="w-3.5 h-3.5" /> : <Video className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
@@ -460,7 +460,7 @@ export default function AudioVideoRoom({
             const rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
 
             // Border & Glow settings depending on active game states
-            let cardClasses = "relative w-36 h-24 sm:w-44 sm:h-30 flex-shrink-0 bg-slate-950 border rounded-xl sm:rounded-2xl overflow-hidden shadow-sm transition-all duration-300 cursor-default flex-none ";
+            let cardClasses = "relative w-36 h-24 flex-shrink-0 bg-slate-950 border rounded-xl overflow-hidden shadow-sm transition-all duration-300 cursor-default flex-none ";
             if (player.isDrawer) {
               cardClasses += "border-indigo-500 ring-2 ring-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.25)]";
             } else if (player.guessed) {

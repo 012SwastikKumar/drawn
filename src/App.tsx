@@ -952,7 +952,7 @@ export default function App() {
           {/* Canvas is persistently visible on both mobile and desktop */}
 
           {/* Core Gameplay Grid Frame */}
-          <main className="flex-1 flex flex-col overflow-hidden p-3 sm:p-4 gap-3 bg-slate-50 relative animate-fade-in" id="game-arena-body">
+          <main className="flex-1 flex flex-col overflow-hidden p-2 sm:p-2.5 gap-2.5 bg-slate-50 relative animate-fade-in" id="game-arena-body">
             {/* TOP ROW: Party Video feeds (Widescreen, highly prominent, always visible on all devices!) */}
             <section className={`w-full shrink-0 ${isMobile && activeMobileTab !== 'players' ? 'hidden' : 'block'}`} id="top-audio-video-section">
               <AudioVideoRoom
@@ -970,7 +970,7 @@ export default function App() {
             <div className="flex-1 flex flex-col sm:flex-row overflow-hidden gap-3 min-h-0" id="arena-split-container">
               {/* COLUMN 1: Drawing Canvas or Lobby rules (Left/Top - Flex-[1.8] on mobile, Flex-[1.6] on desktop/tablet) */}
               <section
-                className={`${isMobile && activeMobileTab !== 'canvas' ? 'hidden' : 'flex'} flex-col sm:h-full overflow-hidden min-h-0 flex-[1.8] sm:flex-[1.6]`}
+                className={`${isMobile && activeMobileTab !== 'canvas' ? 'hidden' : 'flex'} flex-col sm:h-full overflow-hidden min-h-0 flex-[1.8] sm:flex-[2.2]`}
                 id="center-arena-section"
               >
               {/* LOBBY VIEW before game active */}

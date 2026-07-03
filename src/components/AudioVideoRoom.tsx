@@ -14,9 +14,29 @@ interface AudioVideoRoomProps {
 
 const ICE_SERVERS = {
   iceServers: [
+    // Standard STUN servers for direct P2P connections
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun.services.mozilla.com' },
+    
+    // Free Public TURN relay servers (openrelayproject by Metered.ca)
+    // Required to traverse Symmetric NAT firewalls when players connect from different cities/networks (e.g. cellular, public Wi-Fi)
+    {
+      urls: 'turn:openrelay.metered.ca:80',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
+    {
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
+    {
+      urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
   ],
 };
 
@@ -302,20 +322,19 @@ export default function AudioVideoRoom({
             }
           }
         } else if (signal.type === 'candidate') {
-          const pc = pcsRef.current[senderId];
-          if (pc) {
-            if (pc.remoteDescription && pc.remoteDescription.type) {
-              try {
-                await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
-              } catch (e) {
-                console.warn('Failed to add immediate ICE candidate:', e);
-              }
-            } else {
-              if (!(pc as any).iceQueue) {
-                (pc as any).iceQueue = [];
-              }
-              (pc as any).iceQueue.push(signal.candidate);
+          // Lazily initialize connection if not already present, to avoid dropping race-condition candidates
+          const pc = createPeerConnection(senderId);
+          if (pc.remoteDescription && pc.remoteDescription.type) {
+            try {
+              await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+            } catch (e) {
+              console.warn('Failed to add immediate ICE candidate:', e);
             }
+          } else {
+            if (!(pc as any).iceQueue) {
+              (pc as any).iceQueue = [];
+            }
+            (pc as any).iceQueue.push(signal.candidate);
           }
         }
       } catch (err) {

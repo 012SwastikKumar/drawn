@@ -758,15 +758,8 @@ export default function App() {
           {/* Top Elegant Navigation Panel */}
           <header className="h-16 flex-none bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shadow-xs" id="game-header-bar">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center gap-1.5" id="header-brand-logo">
-                <img
-                  src="/header-logo.png"
-                  alt="Drawn Logo"
-                  className="h-10 w-10 rounded-xl object-contain shadow-xs border border-slate-100 animate-fade-in hover:scale-105 transition-transform select-none pointer-events-none"
-                />
-                <span className="text-base font-black tracking-widest text-slate-800 font-sans hidden xs:inline uppercase bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent select-none">
-                  DRAWN
-                </span>
+              <div className="flex items-center justify-center" id="header-brand-logo">
+                <DrawnLogo showTagline={false} animated={true} className="h-12 w-28 sm:w-32 -my-2" />
               </div>
               <div className="hidden sm:flex border-l border-slate-200 pl-3 h-8 flex-col justify-center">
                 <p className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider leading-none mb-1">
@@ -983,15 +976,10 @@ export default function App() {
               {/* LOBBY VIEW before game active */}
               {room.status === 'LOBBY' && (
                 <div className="flex flex-col items-center justify-center flex-1 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-2xl mx-auto my-auto shadow-xl text-slate-850 overflow-y-auto w-full" id="lobby-setup-panel">
-                  <div className="text-center mb-6 animate-fade-in">
-                    <img
-                      src="/lobby-logo.png"
-                      alt="Drawn - Draw. Guess. Laugh. Repeat."
-                      className="w-48 sm:w-60 h-auto mx-auto mb-3 object-contain hover:scale-105 transition-transform duration-300 select-none pointer-events-none"
-                      id="lobby-logo-img"
-                    />
-                    <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-500">Room Setup Lobby</h3>
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Configure rounds and wait for teammates to join.</p>
+                  <div className="text-center mb-6">
+                    <Crown className="w-12 h-12 text-amber-500 mx-auto mb-2 animate-bounce" />
+                    <h3 className="text-sm font-black uppercase tracking-wider text-slate-800">Room Setup Lobby</h3>
+                    <p className="text-xs text-slate-500 mt-1">Configure rounds and wait for players to turn on their media.</p>
                   </div>
 
                   {/* Settings dashboard */}

@@ -40,6 +40,59 @@ const ICE_SERVERS = {
   ],
 };
 
+interface RemoteVideoProps {
+  stream: MediaStream;
+  playerId: string;
+}
+
+function RemoteVideo({ stream, playerId }: RemoteVideoProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+    
+    console.log(`Setting remote video srcObject for peer ${playerId}:`, stream, "Tracks:", stream.getTracks().map(t => t.kind));
+    videoEl.srcObject = stream;
+  }, [stream, playerId]);
+
+  return (
+    <video
+      ref={videoRef}
+      autoPlay
+      playsInline
+      muted
+      className="absolute inset-0 w-full h-full object-cover"
+      id={`remote-stream-${playerId}`}
+    />
+  );
+}
+
+interface RemoteAudioProps {
+  stream: MediaStream;
+  playerId: string;
+}
+
+function RemoteAudio({ stream, playerId }: RemoteAudioProps) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audioEl = audioRef.current;
+    if (!audioEl) return;
+    
+    console.log(`Setting remote audio srcObject for peer ${playerId}:`, stream, "Tracks:", stream.getTracks().map(t => t.kind));
+    audioEl.srcObject = stream;
+  }, [stream, playerId]);
+
+  return (
+    <audio
+      ref={audioRef}
+      autoPlay
+      className="absolute w-0 h-0 opacity-0 pointer-events-none"
+    />
+  );
+}
+
 export default function AudioVideoRoom({
   socket,
   roomId,
@@ -514,15 +567,7 @@ export default function AudioVideoRoom({
               >
                 {/* Background continuous audio player to keep sound playing even if video is toggled off/unmounted */}
                 {remoteStream && !isSelf && (
-                  <audio
-                    ref={(el) => {
-                      if (el && el.srcObject !== remoteStream) {
-                        el.srcObject = remoteStream;
-                      }
-                    }}
-                    autoPlay
-                    className="absolute w-0 h-0 opacity-0 pointer-events-none"
-                  />
+                  <RemoteAudio stream={remoteStream} playerId={player.id} />
                 )}
 
                 {/* Media Stream Video */}
@@ -542,18 +587,7 @@ export default function AudioVideoRoom({
                       id="local-stream-video"
                     />
                   ) : (
-                    <video
-                      ref={(el) => {
-                        if (el && remoteStream && el.srcObject !== remoteStream) {
-                           el.srcObject = remoteStream;
-                        }
-                      }}
-                      autoPlay
-                      playsInline
-                      muted // Muted to avoid browser autoplay policy blocks (handled by background audio element)
-                      className="absolute inset-0 w-full h-full object-cover"
-                      id={`remote-stream-${player.id}`}
-                    />
+                    <RemoteVideo stream={remoteStream} playerId={player.id} />
                   )
                 ) : (
                   // Fallback colored avatar on a beautiful dark gradient background

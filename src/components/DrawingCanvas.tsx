@@ -828,24 +828,34 @@ export default function DrawingCanvas({
             </button>
           </div>
 
-          {/* Section 3: Brush Sizing Segment controller (Standard Compact Size) */}
+          {/* Section 3: Brush Sizing Segment controller (Visual Dots Size indicators) */}
           <div className="flex items-center gap-1 shrink-0" id="brush-size-selection">
             {currentTool !== 'fill' ? (
               <div className="flex items-center bg-slate-200/50 border border-slate-250/70 rounded-xl p-0.5 gap-0.5 shadow-3xs" id="size-segmented-control">
                 {BRUSH_SIZES.map((size) => {
+                  // Proportional dot diameter size calculations
+                  const dotDiameter = size.value === 3 ? 3.5 : size.value === 8 ? 6 : size.value === 16 ? 11 : 16;
                   return (
                     <button
                       key={size.value}
                       onClick={() => setCurrentSize(size.value)}
-                      className={`px-2.5 py-0.5 text-[9px] font-black uppercase rounded-lg transition-all cursor-pointer ${
+                      className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all cursor-pointer ${
                         currentSize === size.value
-                          ? 'bg-brand-primary text-white shadow-sm'
-                          : 'text-slate-500 hover:text-slate-800'
+                          ? 'bg-brand-primary shadow-xs'
+                          : 'hover:bg-slate-300/40 text-slate-500'
                       }`}
                       aria-label={`Brush size ${size.value} pixels`}
                       title={`Size ${size.value}px`}
                     >
-                      {`${size.value}px`}
+                      <span
+                        className={`rounded-full transition-colors ${
+                          currentSize === size.value ? 'bg-white' : 'bg-slate-700'
+                        }`}
+                        style={{
+                          width: `${dotDiameter}px`,
+                          height: `${dotDiameter}px`,
+                        }}
+                      />
                     </button>
                   );
                 })}

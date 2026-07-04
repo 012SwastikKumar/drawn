@@ -994,6 +994,47 @@ export default function App() {
                 lastWebRtcSignal={lastWebRtcSignal}
                 lastDisconnectedPeerId={lastDisconnectedPeerId}
               />
+
+              {/* MOBILE ONLY: Always-visible scoreboard inside the Players Tab */}
+              {isMobile && activeMobileTab === 'players' && (
+                <div className="mt-3 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm select-none" id="mobile-players-leaderboard">
+                  <span className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                    Room Leaderboard
+                  </span>
+                  <div className="space-y-2">
+                    {(Object.values(room.players) as Player[])
+                      .sort((a, b) => {
+                        if (b.score !== a.score) return b.score - a.score;
+                        return a.name.localeCompare(b.name);
+                      })
+                      .map((p) => {
+                        const isSelf = p.id === playerId;
+                        const higherScoringCount = (Object.values(room.players) as Player[]).filter((other) => other.score > p.score).length;
+                        const rank = higherScoringCount + 1;
+                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                        return (
+                          <div
+                            key={p.id}
+                            className={`flex items-center justify-between p-2.5 rounded-xl text-xs border transition-all ${
+                              isSelf
+                                ? 'bg-indigo-50/60 border-indigo-200 font-extrabold shadow-3xs'
+                                : 'bg-slate-50/50 border-slate-200 hover:bg-slate-50'
+                            } ${p.disconnected ? 'opacity-50' : ''}`}
+                          >
+                            <div className="flex items-center gap-2.5 truncate max-w-[70%]">
+                              <span className="font-extrabold text-[12px] leading-none shrink-0 w-5 text-center">{medal}</span>
+                              <span className="w-2.5 h-2.5 rounded-full shrink-0 shadow-3xs border border-white/20" style={{ backgroundColor: p.color }} />
+                              <span className="truncate uppercase tracking-wide text-slate-700 text-[10.5px] leading-none">{p.name}</span>
+                              {isSelf && <span className="text-[7px] bg-indigo-600 text-white font-black px-1 py-0.5 rounded-sm uppercase tracking-wider shrink-0 scale-90">You</span>}
+                              {p.isDrawer && <span className="text-[7px] bg-amber-500 text-white font-black px-1 py-0.5 rounded-sm uppercase tracking-wider shrink-0 scale-90">Drawing</span>}
+                            </div>
+                            <span className="font-mono font-black text-indigo-650 text-[10.5px] shrink-0">{p.score} PTS</span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
             </section>
 
             {/* BOTTOM SECTION: Two-Column split (Drawing board + Chat panel stacked on mobile/narrow view, side-by-side on desktop/tablet) */}

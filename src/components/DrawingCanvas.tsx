@@ -158,7 +158,7 @@ export default function DrawingCanvas({
   
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState('#000000');
-  const [currentSize, setCurrentSize] = useState(8);
+  const [currentSize, setCurrentSize] = useState(3);
   const [currentTool, setCurrentTool] = useState<'brush' | 'line' | 'rect' | 'circle' | 'fill' | 'arrow' | 'triangle' | 'star' | 'diamond'>('brush');
   const [tempEndPoint, setTempEndPoint] = useState<Point | null>(null);
 

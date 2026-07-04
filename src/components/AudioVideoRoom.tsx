@@ -123,14 +123,48 @@ export default function AudioVideoRoom({
   // Sync local tracks to all existing peer connections when localStream is acquired or updated
   useEffect(() => {
     if (!localStream) return;
-    (Object.entries(pcsRef.current) as Array<[string, RTCPeerConnection]>).forEach(([targetId, pc]) => {
-      localStream.getTracks().forEach((track) => {
-        const alreadyAdded = pc.getSenders().some((s) => s.track === track);
-        if (!alreadyAdded) {
-          pc.addTrack(track, localStream);
+    
+    async function syncAndRenegotiate() {
+      for (const [targetId, pc] of Object.entries(pcsRef.current) as Array<[string, RTCPeerConnection]>) {
+        let tracksAdded = false;
+        localStream.getTracks().forEach((track) => {
+          const alreadyAdded = pc.getSenders().some((s) => s.track === track);
+          if (!alreadyAdded) {
+            try {
+              pc.addTrack(track, localStream);
+              tracksAdded = true;
+            } catch (err) {
+              console.warn(`Error adding track to peer connection for ${targetId}:`, err);
+            }
+          }
+        });
+
+        // Initiate renegotiation if new tracks were added to an existing connection
+        if (tracksAdded) {
+          try {
+            console.log(`Initiating WebRTC renegotiation offer to peer: ${targetId}`);
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            if (socket && socket.readyState === WebSocket.OPEN) {
+              socket.send(
+                JSON.stringify({
+                  type: 'webrtc_signal',
+                  payload: {
+                    targetId,
+                    signal: { type: 'offer', sdp: pc.localDescription },
+                  },
+                })
+              );
+            }
+          } catch (negotiateErr) {
+            console.error(`Failed initiating WebRTC renegotiation offer to peer: ${targetId}`, negotiateErr);
+          }
         }
-      });
-    });
+      }
+    }
+
+    syncAndRenegotiate();
   }, [localStream]);
 
   // Notify server of current media profile
@@ -487,7 +521,7 @@ export default function AudioVideoRoom({
                       }
                     }}
                     autoPlay
-                    className="hidden animate-fade-in"
+                    className="absolute w-0 h-0 opacity-0 pointer-events-none"
                   />
                 )}
 

@@ -40,6 +40,84 @@ const SWATCH_COLORS = [
   '#ec4899', // Pink
 ];
 
+const WORD_EMOJI_MAP: Record<string, string> = {
+  'Apple': '🍎',
+  'Banana': '🍌',
+  'Cat': '🐱',
+  'House': '🏠',
+  'Tree': '🌳',
+  'Pizza': '🍕',
+  'Car': '🚗',
+  'Sun': '☀️',
+  'Ocean': '🌊',
+  'Mountain': '⛰️',
+  'Robot': '🤖',
+  'Rocket': '🚀',
+  'Snowman': '⛄',
+  'Cake': '🍰',
+  'Dog': '🐶',
+  'Book': '📖',
+  'Bicycle': '🚲',
+  'Spider': '🕷️',
+  'Dinosaur': '🦖',
+  'Guitar': '🎸',
+  'Trumpet': '🎺',
+  'Elephant': '🐘',
+  'Giraffe': '🦒',
+  'Turtle': '🐢',
+  'Ice Cream': '🍨',
+  'Hamburger': '🍔',
+  'Taco': '🌮',
+  'Cloud': '☁️',
+  'Umbrella': '☔',
+  'Sword': '⚔️',
+  'Crown': '👑',
+  'Key': '🔑',
+  'Lock': '🔒',
+  'Fish': '🐟',
+  'Moon': '🌙',
+  'Star': '⭐',
+  'Boat': '⛵',
+  'Train': '🚆',
+  'Airplane': '✈️',
+  'Clock': '⏰',
+  'Flower': '🌸',
+  'Hat': '🎩',
+  'Shoe': '👞',
+  'Glasses': '👓',
+  'Ring': '💍',
+  'Hammer': '🔨',
+  'Spoon': '🥄',
+  'Fork': '🍴',
+  'Knife': '🔪',
+  'Ladder': '🪜',
+  'Chair': '🪑',
+  'Table': '🪑',
+  'Bed': '🛏️',
+  'Door': '🚪',
+  'Window': '🪟',
+  'Mirror': '🪞',
+  'Computer': '💻',
+  'Phone': '📱',
+  'Camera': '📷',
+  'Pencil': '✏️',
+  'Brush': '🖌️',
+  'Palette': '🎨',
+  'Bucket': '🪣',
+  'Balloon': '🎈',
+  'Flag': '🚩',
+  'Monkey': '🐵',
+  'Lion': '🦁',
+  'Duck': '🦆',
+  'Frog': '🐸',
+  'Sheep': '🐑',
+  'Cow': '🐮',
+  'Horse': '🐴',
+  'Rabbit': '🐰',
+  'Mouse': '🐭',
+  'Heart': '❤️'
+};
+
 export default function App() {
   // Connection states
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -780,7 +858,16 @@ export default function App() {
                     : 'bg-slate-50 border-slate-200'
                 }`}>
                   <span className="text-[11px] xs:text-sm sm:text-xl font-black tracking-[0.1em] xs:tracking-[0.2em] sm:tracking-[0.4em] text-slate-850 font-mono uppercase truncate" id="masked-word-display">
-                    {isMyTurnToDraw ? room.currentWord.toUpperCase() : maskedWord}
+                    {isMyTurnToDraw ? (
+                      <span className="flex items-center gap-1.5 tracking-normal">
+                        <span className="tracking-[0.1em] xs:tracking-[0.2em] sm:tracking-[0.4em]">{room.currentWord.toUpperCase()}</span>
+                        <span className="text-sm xs:text-base sm:text-2xl select-none" title="Reference Illustration">
+                          {WORD_EMOJI_MAP[room.currentWord] || '🎨'}
+                        </span>
+                      </span>
+                    ) : (
+                      maskedWord
+                    )}
                   </span>
                   <div className={`h-4 sm:h-6 w-px ${room.timeRemaining <= 15 ? 'bg-red-200' : 'bg-slate-200'}`}></div>
                   <span className={`font-mono font-black text-xs sm:text-xl ${
@@ -1008,7 +1095,9 @@ export default function App() {
                             <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-indigo-100 text-indigo-700 text-[8px] font-bold rounded-bl-lg uppercase tracking-widest group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                               Option {idx + 1}
                             </div>
-                            <span className="text-2xl sm:text-3xl animate-pulse group-hover:scale-110 transition-transform">🎨</span>
+                            <div className="w-16 h-16 bg-white rounded-2xl shadow-xs border border-slate-100/80 flex items-center justify-center text-4xl group-hover:scale-110 transition-all select-none mb-1">
+                              {WORD_EMOJI_MAP[word] || '🎨'}
+                            </div>
                             <span className="uppercase text-indigo-950 font-black leading-tight text-center">{word}</span>
                           </button>
                         ))}

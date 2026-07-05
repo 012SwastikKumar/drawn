@@ -292,7 +292,11 @@ export default function AudioVideoRoom({
       return pcsRef.current[targetId];
     }
 
-    const pc = new RTCPeerConnection(ICE_SERVERS);
+    const pc = new RTCPeerConnection({
+      ...ICE_SERVERS,
+      iceCandidatePoolSize: 10,
+      bundlePolicy: 'max-bundle',
+    });
     (pc as any).iceQueue = [];
 
     // Track state exchanges

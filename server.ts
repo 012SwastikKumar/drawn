@@ -682,7 +682,10 @@ wss.on('connection', (socket: WebSocket, request) => {
 
   socket.on('close', () => {
     const connection = activeConnections[currentConnectPlayerId];
-    if (connection) {
+    
+    // CRITICAL: Only perform disconnect cleanup if the active connection's socket
+    // matches this specific socket instance that is closing (reconnect/reload safety).
+    if (connection && connection.socket === socket) {
       const { roomId } = connection;
       if (roomId && rooms[roomId]) {
         const room = rooms[roomId];
@@ -764,7 +767,12 @@ wss.on('connection', (socket: WebSocket, request) => {
           }, 60000);
         }
       }
-      delete activeConnections[currentConnectPlayerId];
+      
+      // Re-check to ensure we don't delete a new connection that was re-mapped to this playerId
+      const currentConnectionObj = activeConnections[currentConnectPlayerId];
+      if (currentConnectionObj && currentConnectionObj.socket === socket) {
+        delete activeConnections[currentConnectPlayerId];
+      }
     }
   });
 });

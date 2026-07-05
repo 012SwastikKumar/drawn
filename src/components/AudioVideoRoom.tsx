@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Player } from '../types.js';
 import { Video, VideoOff, Mic, MicOff, Volume2, ShieldAlert, ShieldCheck } from 'lucide-react';
 
@@ -175,7 +175,7 @@ export default function AudioVideoRoom({
 
   // Sync local tracks to all existing peer connections when localStream is acquired or updated
   useEffect(() => {
-    if (!localStream) return;
+    if (!localStream || !socket || socket.readyState !== WebSocket.OPEN) return;
     
     async function syncAndRenegotiate() {
       for (const [targetId, pc] of Object.entries(pcsRef.current) as Array<[string, RTCPeerConnection]>) {
@@ -218,6 +218,7 @@ export default function AudioVideoRoom({
     }
 
     syncAndRenegotiate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localStream, socket]);
 
   // Notify server of current media profile
@@ -318,7 +319,7 @@ export default function AudioVideoRoom({
 
   // Call all existing members when joining as a new member
   useEffect(() => {
-    if (!localStream || existingPlayerIds.length === 0) return;
+    if (!localStream || existingPlayerIds.length === 0 || !socket || socket.readyState !== WebSocket.OPEN) return;
 
     async function makeCalls() {
       for (const targetId of existingPlayerIds) {
@@ -347,10 +348,11 @@ export default function AudioVideoRoom({
     }
 
     makeCalls();
-  }, [localStream, existingPlayerIds, socket, playerId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localStream, existingPlayerIds, socket]);
 
   // Process all queued incoming WebRTC signals once local stream is ready
-  const processPendingSignals = useCallback(async () => {
+  const processPendingSignals = async () => {
     if (!localStream) return;
     const queue = [...pendingSignalsRef.current];
     pendingSignalsRef.current = [];
@@ -440,21 +442,23 @@ export default function AudioVideoRoom({
         console.error(`Error processing WebRTC signal from peer ${senderId}:`, err);
       }
     }
-  }, [localStream, socket, playerId]);
+  };
 
   // Queue incoming signaling messages forwarded by the server
   useEffect(() => {
     if (!lastWebRtcSignal) return;
     pendingSignalsRef.current.push(lastWebRtcSignal);
     processPendingSignals();
-  }, [lastWebRtcSignal, processPendingSignals]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastWebRtcSignal]);
 
   // Drain pending signal queue as soon as local media stream is ready
   useEffect(() => {
     if (localStream) {
       processPendingSignals();
     }
-  }, [localStream, processPendingSignals]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localStream]);
 
   // Clean up disconnected player's WebRTC channels
   useEffect(() => {

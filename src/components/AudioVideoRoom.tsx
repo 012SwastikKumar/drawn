@@ -609,9 +609,17 @@ export default function AudioVideoRoom({
                   </div>
                 )}
 
-                {/* Minimalistic Player Name overlay (Google Meet / Zoom style) */}
-                <div className="absolute bottom-1 left-1 bg-slate-950/65 backdrop-blur-xs px-1.5 py-0.5 rounded text-[8.5px] sm:text-[9.5px] font-black text-white/95 shadow-3xs max-w-[75px] sm:max-w-[95px] truncate select-none uppercase tracking-wider">
-                  {player.name} {isSelf && " (You)"} {player.disconnected && " 🔌"}
+                {/* Minimalistic Mic status indicator on Bottom Right */}
+                <div className="absolute bottom-1.5 right-1.5 z-10 select-none pointer-events-none">
+                  {(player.id === playerId ? isMuted : !player.hasMic) ? (
+                    <div className="p-0.5 bg-red-600/90 backdrop-blur-xs rounded-full text-white border border-red-500/30 shadow-xs flex items-center justify-center">
+                      <MicOff className="w-2.5 h-2.5" />
+                    </div>
+                  ) : (
+                    <div className="p-0.5 bg-slate-950/50 backdrop-blur-xs rounded-full text-slate-200 border border-white/10 shadow-xs flex items-center justify-center">
+                      <Mic className="w-2.5 h-2.5" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Silent background audio element */}

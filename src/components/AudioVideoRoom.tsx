@@ -20,33 +20,34 @@ const ICE_SERVERS = {
     { urls: 'stun:stun2.l.google.com:19302' },
     { urls: 'stun:stun.services.mozilla.com' },
     
-    // Free Public TURN relay servers (openrelayproject by Metered.ca)
-    // Required to traverse Symmetric NAT firewalls when players connect from different cities/networks (e.g. cellular, public Wi-Fi)
+    // Custom High-Performance Global STUN/TURN servers (drawn project on Metered.ca)
     {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
+      urls: 'stun:stun.relay.metered.ca:80',
     },
     {
-      urls: 'turn:openrelay.metered.ca:443',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
+      urls: 'turn:global.relay.metered.ca:80',
+      username: '0a5fd2e589094d21e71b764e',
+      credential: 'YkkzhUl0PdQLvF9k',
     },
     {
-      urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
-    },
-    // Secure TURN (TURNS) running over TLS/SSL (Encrypted, highly reliable, bypasses strict carrier & public firewalls)
-    {
-      urls: 'turns:openrelay.metered.ca:443',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
+      urls: 'turn:global.relay.metered.ca:80?transport=tcp',
+      username: '0a5fd2e589094d21e71b764e',
+      credential: 'YkkzhUl0PdQLvF9k',
     },
     {
-      urls: 'turns:openrelay.metered.ca:443?transport=tcp',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
+      urls: 'turn:global.relay.metered.ca:443',
+      username: '0a5fd2e589094d21e71b764e',
+      credential: 'YkkzhUl0PdQLvF9k',
+    },
+    {
+      urls: 'turns:global.relay.metered.ca:443',
+      username: '0a5fd2e589094d21e71b764e',
+      credential: 'YkkzhUl0PdQLvF9k',
+    },
+    {
+      urls: 'turns:global.relay.metered.ca:443?transport=tcp',
+      username: '0a5fd2e589094d21e71b764e',
+      credential: 'YkkzhUl0PdQLvF9k',
     },
   ],
 };

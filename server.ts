@@ -247,6 +247,12 @@ function endGame(roomId: string) {
   const room = rooms[roomId];
   if (!room) return;
 
+  // Clear any scheduled startRound intervals
+  if (roomIntervals[roomId]) {
+    clearTimeout(roomIntervals[roomId]);
+    delete roomIntervals[roomId];
+  }
+
   room.status = 'GAME_OVER';
   room.currentDrawerId = null;
 
@@ -484,6 +490,54 @@ wss.on('connection', (socket: WebSocket, request) => {
 
           addSystemMessage(connection.roomId, `🚨 The host forced the game to end!`);
           endGame(connection.roomId);
+          break;
+        }
+
+        case 'kick_player': {
+          const connection = activeConnections[playerId];
+          if (!connection || !connection.roomId) return;
+          const room = rooms[connection.roomId];
+          if (!room || !room.players[playerId]?.isHost) return;
+
+          const { targetId } = message.payload;
+          if (targetId === playerId) return; // Cannot kick yourself
+          
+          const targetConnection = activeConnections[targetId];
+          if (targetConnection) {
+            const kickedPlayer = room.players[targetId];
+            const kickedPlayerName = kickedPlayer ? kickedPlayer.name : 'Player';
+            
+            // Send a kicked packet to the target player to show a message and disconnect them
+            targetConnection.socket.send(JSON.stringify({
+              type: 'kicked',
+              payload: { reason: 'You have been kicked by the host.' }
+            }));
+            
+            // Force close their socket connection
+            targetConnection.socket.close();
+            
+            addSystemMessage(connection.roomId, `${kickedPlayerName} was kicked from the room by the host.`);
+          }
+          break;
+        }
+
+        case 'transfer_host': {
+          const connection = activeConnections[playerId];
+          if (!connection || !connection.roomId) return;
+          const room = rooms[connection.roomId];
+          if (!room || !room.players[playerId]?.isHost) return;
+
+          const { targetId } = message.payload;
+          if (targetId === playerId) return; // Cannot transfer to yourself
+          
+          const targetPlayer = room.players[targetId];
+          if (targetPlayer) {
+            room.players[playerId].isHost = false;
+            targetPlayer.isHost = true;
+            
+            addSystemMessage(connection.roomId, `${targetPlayer.name} has been made host of the room.`);
+            broadcastToRoom(connection.roomId, { type: 'sync_state', payload: { room, strokes: roomStrokes[connection.roomId] } });
+          }
           break;
         }
 

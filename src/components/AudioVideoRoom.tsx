@@ -12,45 +12,12 @@ interface AudioVideoRoomProps {
   lastDisconnectedPeerId: string | null;
 }
 
-const ICE_SERVERS = {
-  iceServers: [
-    // Standard STUN servers for direct P2P connections
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' },
-    { urls: 'stun:stun.services.mozilla.com' },
-    
-    // Custom High-Performance Global STUN/TURN servers (drawn project on Metered.ca)
-    {
-      urls: 'stun:stun.relay.metered.ca:80',
-    },
-    {
-      urls: 'turn:global.relay.metered.ca:80',
-      username: '0a5fd2e589094d21e71b764e',
-      credential: 'YkkzhUl0PdQLvF9k',
-    },
-    {
-      urls: 'turn:global.relay.metered.ca:80?transport=tcp',
-      username: '0a5fd2e589094d21e71b764e',
-      credential: 'YkkzhUl0PdQLvF9k',
-    },
-    {
-      urls: 'turn:global.relay.metered.ca:443',
-      username: '0a5fd2e589094d21e71b764e',
-      credential: 'YkkzhUl0PdQLvF9k',
-    },
-    {
-      urls: 'turns:global.relay.metered.ca:443',
-      username: '0a5fd2e589094d21e71b764e',
-      credential: 'YkkzhUl0PdQLvF9k',
-    },
-    {
-      urls: 'turns:global.relay.metered.ca:443?transport=tcp',
-      username: '0a5fd2e589094d21e71b764e',
-      credential: 'YkkzhUl0PdQLvF9k',
-    },
-  ],
-};
+const DEFAULT_ICE_SERVERS: RTCIceServer[] = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun.services.mozilla.com' },
+];
 
 interface RemoteVideoProps {
   stream: MediaStream;
@@ -116,6 +83,29 @@ export default function AudioVideoRoom({
 }: AudioVideoRoomProps) {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
+  const [iceServers, setIceServers] = useState<RTCIceServer[]>([]);
+
+  useEffect(() => {
+    async function fetchDynamicIceServers() {
+      try {
+        console.log('[WebRTC] Fetching dynamic TURN credentials from Metered.ca...');
+        const response = await fetch(
+          'https://drawn.metered.live/api/v1/turn/credentials?apiKey=bf232f2db9beb6750025a822a5275a2d27e1'
+        );
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          console.log('[WebRTC] Dynamic TURN credentials loaded successfully. Server count:', data.length);
+          setIceServers(data);
+        } else {
+          console.warn('[WebRTC] Unexpected response format from Metered API:', data);
+        }
+      } catch (err) {
+        console.error('[WebRTC] Failed fetching dynamic TURN credentials:', err);
+      }
+    }
+    
+    fetchDynamicIceServers();
+  }, []);
 
   const socketRef = useRef(socket);
   const playerIdRef = useRef(playerId);
@@ -294,7 +284,7 @@ export default function AudioVideoRoom({
     }
 
     const pc = new RTCPeerConnection({
-      ...ICE_SERVERS,
+      iceServers: iceServers.length > 0 ? iceServers : DEFAULT_ICE_SERVERS,
       iceCandidatePoolSize: 10,
       bundlePolicy: 'max-bundle',
     });

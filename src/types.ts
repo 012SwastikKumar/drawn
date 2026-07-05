@@ -38,7 +38,7 @@ export interface Stroke {
   points: Point[];
   color: string;
   thickness: number;
-  type?: 'brush' | 'line' | 'rect' | 'circle' | 'fill';
+  type?: 'brush' | 'line' | 'rect' | 'circle' | 'fill' | 'arrow' | 'triangle' | 'star' | 'diamond';
 }
 
 export interface ChatMessage {
@@ -68,7 +68,10 @@ export type SocketMessageType =
   | 'init_player'
   | 'join_success'
   | 'peer_disconnected'
-  | 'force_end_game';
+  | 'force_end_game'
+  | 'kick_player'
+  | 'transfer_host'
+  | 'kicked';
 
 export interface SocketMessage {
   type: SocketMessageType;

@@ -104,6 +104,22 @@ export default function AudioVideoRoom({
 }: AudioVideoRoomProps) {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
+
+  const socketRef = useRef(socket);
+  const playerIdRef = useRef(playerId);
+  const localStreamRef = useRef(localStream);
+
+  useEffect(() => {
+    socketRef.current = socket;
+  }, [socket]);
+
+  useEffect(() => {
+    playerIdRef.current = playerId;
+  }, [playerId]);
+
+  useEffect(() => {
+    localStreamRef.current = localStream;
+  }, [localStream]);
   const [hasCamera, setHasCamera] = useState(false);
   const [hasMic, setHasMic] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -199,8 +215,9 @@ export default function AudioVideoRoom({
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
 
-            if (socket && socket.readyState === WebSocket.OPEN) {
-              socket.send(
+            const activeSocket = socketRef.current;
+            if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+              activeSocket.send(
                 JSON.stringify({
                   type: 'webrtc_signal',
                   payload: {
@@ -223,8 +240,9 @@ export default function AudioVideoRoom({
 
   // Notify server of current media profile
   function updateMediaStatus(camera: boolean, mic: boolean) {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(
+    const activeSocket = socketRef.current;
+    if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+      activeSocket.send(
         JSON.stringify({
           type: 'toggle_media',
           payload: { hasCamera: camera, hasMic: mic },
@@ -268,8 +286,9 @@ export default function AudioVideoRoom({
 
     // Track state exchanges
     pc.onicecandidate = (e) => {
-      if (e.candidate && socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(
+      const activeSocket = socketRef.current;
+      if (e.candidate && activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+        activeSocket.send(
           JSON.stringify({
             type: 'webrtc_signal',
             payload: {
@@ -307,9 +326,10 @@ export default function AudioVideoRoom({
     };
 
     // Attach local media tracks if active
-    if (localStream) {
-      localStream.getTracks().forEach((track) => {
-        pc.addTrack(track, localStream);
+    const activeStream = localStreamRef.current;
+    if (activeStream) {
+      activeStream.getTracks().forEach((track) => {
+        pc.addTrack(track, activeStream);
       });
     }
 
@@ -323,15 +343,16 @@ export default function AudioVideoRoom({
 
     async function makeCalls() {
       for (const targetId of existingPlayerIds) {
-        if (targetId === playerId) continue;
+        if (targetId === playerIdRef.current) continue;
         const pc = createPeerConnection(targetId);
 
         try {
           const offer = await pc.createOffer();
           await pc.setLocalDescription(offer);
 
-          if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(
+          const activeSocket = socketRef.current;
+          if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+            activeSocket.send(
               JSON.stringify({
                 type: 'webrtc_signal',
                 payload: {
@@ -359,13 +380,13 @@ export default function AudioVideoRoom({
 
     for (const item of queue) {
       const { senderId, signal } = item;
-      if (senderId === playerId) continue;
+      if (senderId === playerIdRef.current) continue;
 
       try {
         if (signal.type === 'offer') {
           // Proactively close and remove any existing stale peer connection for this sender only if this is an explicit reconnect
           const stalePc = pcsRef.current[senderId];
-          if (stalePc && signal.reconnect && stalePc.remoteDescription && stalePc.remoteDescription.type) {
+          if (stalePc && signal.reconnect) {
             console.log(`Closing stale peer connection for reconnecting peer: ${senderId}`);
             try { stalePc.close(); } catch (e) {}
             delete pcsRef.current[senderId];
@@ -394,8 +415,9 @@ export default function AudioVideoRoom({
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
 
-          if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(
+          const activeSocket = socketRef.current;
+          if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+            activeSocket.send(
               JSON.stringify({
                 type: 'webrtc_signal',
                 payload: {

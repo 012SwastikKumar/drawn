@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Player } from '../types.js';
 import { Video, VideoOff, Mic, MicOff, Volume2, ShieldAlert, ShieldCheck } from 'lucide-react';
 
@@ -218,7 +218,7 @@ export default function AudioVideoRoom({
     }
 
     syncAndRenegotiate();
-  }, [localStream]);
+  }, [localStream, socket]);
 
   // Notify server of current media profile
   function updateMediaStatus(camera: boolean, mic: boolean) {
@@ -280,6 +280,14 @@ export default function AudioVideoRoom({
       }
     };
 
+    pc.onconnectionstatechange = () => {
+      console.log(`[WebRTC] Connection state change for peer ${targetId}: ${pc.connectionState}`);
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log(`[WebRTC] ICE connection state change for peer ${targetId}: ${pc.iceConnectionState}`);
+    };
+
     pc.ontrack = (e) => {
       console.log('OnTrack event received for peer:', targetId, e.streams);
       setRemoteStreams((prev) => {
@@ -339,10 +347,10 @@ export default function AudioVideoRoom({
     }
 
     makeCalls();
-  }, [localStream, existingPlayerIds]);
+  }, [localStream, existingPlayerIds, socket, playerId]);
 
   // Process all queued incoming WebRTC signals once local stream is ready
-  const processPendingSignals = async () => {
+  const processPendingSignals = useCallback(async () => {
     if (!localStream) return;
     const queue = [...pendingSignalsRef.current];
     pendingSignalsRef.current = [];
@@ -355,7 +363,7 @@ export default function AudioVideoRoom({
         if (signal.type === 'offer') {
           // Proactively close and remove any existing stale peer connection for this sender (e.g. on reload/reconnect)
           const stalePc = pcsRef.current[senderId];
-          if (stalePc) {
+          if (stalePc && stalePc.remoteDescription && stalePc.remoteDescription.type) {
             console.log(`Closing stale peer connection for reconnecting peer: ${senderId}`);
             try { stalePc.close(); } catch (e) {}
             delete pcsRef.current[senderId];
@@ -432,21 +440,21 @@ export default function AudioVideoRoom({
         console.error(`Error processing WebRTC signal from peer ${senderId}:`, err);
       }
     }
-  };
+  }, [localStream, socket, playerId]);
 
   // Queue incoming signaling messages forwarded by the server
   useEffect(() => {
     if (!lastWebRtcSignal) return;
     pendingSignalsRef.current.push(lastWebRtcSignal);
     processPendingSignals();
-  }, [lastWebRtcSignal]);
+  }, [lastWebRtcSignal, processPendingSignals]);
 
   // Drain pending signal queue as soon as local media stream is ready
   useEffect(() => {
     if (localStream) {
       processPendingSignals();
     }
-  }, [localStream]);
+  }, [localStream, processPendingSignals]);
 
   // Clean up disconnected player's WebRTC channels
   useEffect(() => {

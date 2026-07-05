@@ -336,7 +336,7 @@ export default function AudioVideoRoom({
                 type: 'webrtc_signal',
                 payload: {
                   targetId,
-                  signal: { type: 'offer', sdp: pc.localDescription },
+                  signal: { type: 'offer', sdp: pc.localDescription, reconnect: true },
                 },
               })
             );
@@ -363,9 +363,9 @@ export default function AudioVideoRoom({
 
       try {
         if (signal.type === 'offer') {
-          // Proactively close and remove any existing stale peer connection for this sender (e.g. on reload/reconnect)
+          // Proactively close and remove any existing stale peer connection for this sender only if this is an explicit reconnect
           const stalePc = pcsRef.current[senderId];
-          if (stalePc && stalePc.remoteDescription && stalePc.remoteDescription.type) {
+          if (stalePc && signal.reconnect && stalePc.remoteDescription && stalePc.remoteDescription.type) {
             console.log(`Closing stale peer connection for reconnecting peer: ${senderId}`);
             try { stalePc.close(); } catch (e) {}
             delete pcsRef.current[senderId];

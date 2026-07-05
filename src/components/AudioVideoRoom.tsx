@@ -609,63 +609,10 @@ export default function AudioVideoRoom({
                   </div>
                 )}
 
-                {/* Overlaid Badges (Top Left: Rank, Player Name, and Score in single floating glass tag) */}
-                <div className="absolute top-1.5 left-1.5 flex items-center z-10 max-w-[85%] select-none pointer-events-none" id={`player-info-${player.id}`}>
-                  <div className="flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-1 bg-slate-950/70 backdrop-blur-md rounded-full text-[8.5px] sm:text-[10px] font-black text-white shadow-md border border-white/10 shrink-0">
-                    <span className="mr-0.5 leading-none">{rankBadge}</span>
-                    <span className="truncate max-w-[45px] sm:max-w-[70px] uppercase tracking-wide leading-none">{player.name}</span>
-                    {isSelf && <span className="text-[7px] bg-indigo-600 text-white font-black px-1 py-px rounded-sm uppercase tracking-wider scale-90 select-none">You</span>}
-                    <span className="opacity-40 select-none">•</span>
-                    <span className="font-mono text-slate-200 leading-none">{player.score}</span>
-                  </div>
+                {/* Minimalistic Player Name overlay (Google Meet / Zoom style) */}
+                <div className="absolute bottom-1 left-1 bg-slate-950/65 backdrop-blur-xs px-1.5 py-0.5 rounded text-[8.5px] sm:text-[9.5px] font-black text-white/95 shadow-3xs max-w-[75px] sm:max-w-[95px] truncate select-none uppercase tracking-wider">
+                  {player.name} {isSelf && " (You)"} {player.disconnected && " 🔌"}
                 </div>
-
-                 {/* Overlaid Badges (Top Right: Correct, Drawing or Offline Status) */}
-                 {player.disconnected ? (
-                   <div className="absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 sm:px-2 bg-red-650/90 backdrop-blur-xs text-white text-[8px] font-black uppercase tracking-widest rounded-full border border-red-500 shadow-md animate-pulse z-10">
-                     🔌 Offline
-                   </div>
-                 ) : player.guessed ? (
-                   <div className="absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 sm:px-2 bg-emerald-600/90 backdrop-blur-xs text-white text-[8px] font-black uppercase tracking-widest rounded-full border border-emerald-500 shadow-md animate-bounce z-10" id={`guessed-badge-${player.id}`}>
-                     🎉 Correct
-                   </div>
-                 ) : player.isDrawer ? (
-                   <div className="absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 sm:px-2 bg-indigo-600/90 backdrop-blur-xs text-white text-[8px] font-black uppercase tracking-widest rounded-full border border-indigo-500 shadow-md animate-pulse z-10">
-                     Drawing
-                   </div>
-                 ) : null}
-
-                {/* Floating Mic status indicator on Bottom Right (no background obstruction) */}
-                <div className="absolute bottom-1.5 right-1.5 z-10">
-                  {player.id === playerId ? (
-                    isMuted ? (
-                      <div className="p-1 sm:p-1.5 bg-red-600/90 backdrop-blur-md rounded-full text-white border border-red-500/50 shadow-md">
-                        <MicOff className="w-2.5 h-2.5" />
-                      </div>
-                    ) : (
-                      <div className="p-1 sm:p-1.5 bg-black/40 backdrop-blur-md rounded-full text-slate-200 border border-white/10 shadow-md">
-                        <Mic className="w-2.5 h-2.5" />
-                      </div>
-                    )
-                  ) : !player.hasMic ? (
-                    <div className="p-1 sm:p-1.5 bg-red-600/95 backdrop-blur-md rounded-full text-white border border-red-500/50 shadow-md">
-                      <MicOff className="w-2.5 h-2.5" />
-                    </div>
-                  ) : (
-                    <div className="p-1 sm:p-1.5 bg-black/40 backdrop-blur-md rounded-full text-slate-200 border border-white/10 shadow-md">
-                      <Mic className="w-2.5 h-2.5" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Floating Points Gain indicator on Bottom Left */}
-                {player.roundScore > 0 && (
-                  <div className="absolute bottom-1.5 left-1.5 z-10 animate-bounce">
-                    <span className="text-[8.5px] sm:text-[9.5px] text-emerald-400 font-extrabold px-1.5 py-0.5 bg-slate-950/70 backdrop-blur-md border border-emerald-500/35 rounded-full shadow-md">
-                      +{player.roundScore} PTS
-                    </span>
-                  </div>
-                )}
 
                 {/* Silent background audio element */}
                 {!isSelf && remoteStream && (

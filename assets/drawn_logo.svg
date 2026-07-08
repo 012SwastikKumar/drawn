@@ -1,0 +1,152 @@
+<svg
+  viewBox="0 0 650 320"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-label="DRAWN Logo"
+>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@900&amp;display=swap');
+      .brand-bubble {
+        font-family: 'Fredoka', 'Comic Sans MS', sans-serif;
+        font-weight: 900;
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+    </style>
+    <filter id="logo-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="6" flood-color="#0b112c" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <!-- 1. BACKGROUND SPLASHES -->
+  <g id="splashes-group">
+    <!-- Blue Splatter Left -->
+    <circle cx="80" cy="180" r="14" fill="#38bdf8" />
+    <path d="M80 180 Q50 200 65 220" stroke="#38bdf8" stroke-width="10" stroke-linecap="round" />
+    
+    <!-- Green Splatter Top Left -->
+    <circle cx="160" cy="80" r="10" fill="#4ade80" />
+    <path d="M160 80 Q145 60 170 50" stroke="#4ade80" stroke-width="8" stroke-linecap="round" />
+
+    <!-- Yellow Splatter Top Right -->
+    <circle cx="390" cy="65" r="12" fill="#facc15" />
+    
+    <!-- Pink Splatter Right -->
+    <circle cx="560" cy="160" r="12" fill="#f472b6" />
+    <path d="M560 160 Q590 140 575 125" stroke="#f472b6" stroke-width="8" stroke-linecap="round" />
+    
+    <!-- Purple Splatter Bottom Right -->
+    <circle cx="540" cy="245" r="9" fill="#c084fc" />
+  </g>
+
+  <!-- 2. THE MASCOT NOTEBOOK -->
+  <g id="mascot-notebook-behind" transform="translate(35, -25) rotate(4 250 150)">
+    <rect x="235" y="75" width="210" height="150" rx="24" fill="#0b112c" opacity="0.15" />
+    <rect x="225" y="65" width="220" height="160" rx="28" fill="#ffffff" stroke="#0b112c" stroke-width="8" stroke-linejoin="round" />
+    <rect x="235" y="75" width="200" height="140" rx="18" fill="#f8fafc" />
+
+    <!-- Wire spirals -->
+    <rect x="255" y="45" width="14" height="32" rx="7" fill="#64748b" stroke="#0b112c" stroke-width="5" />
+    <rect x="295" y="45" width="14" height="32" rx="7" fill="#64748b" stroke="#0b112c" stroke-width="5" />
+    <rect x="335" y="45" width="14" height="32" rx="7" fill="#64748b" stroke="#0b112c" stroke-width="5" />
+    <rect x="375" y="45" width="14" height="32" rx="7" fill="#64748b" stroke="#0b112c" stroke-width="5" />
+    <rect x="415" y="45" width="14" height="32" rx="7" fill="#64748b" stroke="#0b112c" stroke-width="5" />
+
+    <!-- Face -->
+    <circle cx="295" cy="130" r="10" fill="#0b112c" />
+    <circle cx="292" cy="127" r="3" fill="#ffffff" />
+    <path d="M365 135 Q375 120 385 135" stroke="#0b112c" stroke-width="7" stroke-linecap="round" fill="none" />
+    <path d="M310 155 Q335 180 360 155" stroke="#0b112c" stroke-width="7" stroke-linecap="round" fill="none" />
+    <circle cx="275" cy="155" r="8" fill="#f472b6" opacity="0.5" />
+    <circle cx="385" cy="155" r="8" fill="#f472b6" opacity="0.5" />
+  </g>
+
+  <!-- 3. MASCOT PENCIL -->
+  <g id="mascot-pencil" transform="translate(195, -55) rotate(48 250 150)">
+    <path d="M225 150 L255 150 L255 230 L225 230 Z" fill="#f59e0b" stroke="#0b112c" stroke-width="7" stroke-linejoin="round" />
+    <rect x="234" y="150" width="12" height="80" fill="#fbbf24" />
+    <path d="M225 230 L255 230 L240 260 Z" fill="#fed7aa" stroke="#0b112c" stroke-width="7" stroke-linejoin="round" />
+    <path d="M234 248 L246 248 L240 260 Z" fill="#0b112c" />
+    <rect x="225" y="137" width="30" height="13" fill="#94a3b8" stroke="#0b112c" stroke-width="7" stroke-linejoin="round" />
+    <path d="M225 137 L255 137 C255 122 225 122 225 137 Z" fill="#f472b6" stroke="#0b112c" stroke-width="7" stroke-linejoin="round" />
+  </g>
+
+  <!-- 4. THE DRAWN 3D BUBBLE LETTERS -->
+  <g id="drawn-letters-sticker">
+    <!-- D -->
+    <g transform="translate(105, 175) rotate(-8)">
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="28" stroke-linejoin="round" y="0">D</text>
+      <text class="brand-bubble" font-size="105" fill="#ffffff" stroke="#ffffff" stroke-width="18" stroke-linejoin="round" y="0">D</text>
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="10" stroke-linejoin="round" y="0">D</text>
+      <text class="brand-bubble" font-size="105" fill="#0284c7" stroke="#0284c7" stroke-width="4" stroke-linejoin="round" y="8">D</text>
+      <text class="brand-bubble" font-size="105" fill="#38bdf8" y="0">D</text>
+      <circle cx="-16" cy="-28" r="7" fill="#ffffff" opacity="0.85" />
+      <circle cx="-24" cy="-18" r="4" fill="#ffffff" opacity="0.65" />
+    </g>
+    <!-- R -->
+    <g transform="translate(200, 170) rotate(-3)">
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="28" stroke-linejoin="round" y="0">R</text>
+      <text class="brand-bubble" font-size="105" fill="#ffffff" stroke="#ffffff" stroke-width="18" stroke-linejoin="round" y="0">R</text>
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="10" stroke-linejoin="round" y="0">R</text>
+      <text class="brand-bubble" font-size="105" fill="#16a34a" stroke="#16a34a" stroke-width="4" stroke-linejoin="round" y="8">R</text>
+      <text class="brand-bubble" font-size="105" fill="#4ade80" y="0">R</text>
+      <circle cx="-16" cy="-28" r="7" fill="#ffffff" opacity="0.85" />
+      <circle cx="-24" cy="-18" r="4" fill="#ffffff" opacity="0.65" />
+    </g>
+    <!-- A -->
+    <g transform="translate(295, 172) rotate(2)">
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="28" stroke-linejoin="round" y="0">A</text>
+      <text class="brand-bubble" font-size="105" fill="#ffffff" stroke="#ffffff" stroke-width="18" stroke-linejoin="round" y="0">A</text>
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="10" stroke-linejoin="round" y="0">A</text>
+      <text class="brand-bubble" font-size="105" fill="#ca8a04" stroke="#ca8a04" stroke-width="4" stroke-linejoin="round" y="8">A</text>
+      <text class="brand-bubble" font-size="105" fill="#facc15" y="0">A</text>
+      <circle cx="-16" cy="-28" r="7" fill="#ffffff" opacity="0.85" />
+      <circle cx="-24" cy="-18" r="4" fill="#ffffff" opacity="0.65" />
+    </g>
+    <!-- W -->
+    <g transform="translate(395, 175) rotate(-2)">
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="28" stroke-linejoin="round" y="0">W</text>
+      <text class="brand-bubble" font-size="105" fill="#ffffff" stroke="#ffffff" stroke-width="18" stroke-linejoin="round" y="0">W</text>
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="10" stroke-linejoin="round" y="0">W</text>
+      <text class="brand-bubble" font-size="105" fill="#9333ea" stroke="#9333ea" stroke-width="4" stroke-linejoin="round" y="8">W</text>
+      <text class="brand-bubble" font-size="105" fill="#c084fc" y="0">W</text>
+      <circle cx="-16" cy="-28" r="7" fill="#ffffff" opacity="0.85" />
+      <circle cx="-24" cy="-18" r="4" fill="#ffffff" opacity="0.65" />
+    </g>
+    <!-- N -->
+    <g transform="translate(495, 178) rotate(6)">
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="28" stroke-linejoin="round" y="0">N</text>
+      <text class="brand-bubble" font-size="105" fill="#ffffff" stroke="#ffffff" stroke-width="18" stroke-linejoin="round" y="0">N</text>
+      <text class="brand-bubble" font-size="105" fill="#0b112c" stroke="#0b112c" stroke-width="10" stroke-linejoin="round" y="0">N</text>
+      <text class="brand-bubble" font-size="105" fill="#db2777" stroke="#db2777" stroke-width="4" stroke-linejoin="round" y="8">N</text>
+      <text class="brand-bubble" font-size="105" fill="#f472b6" y="0">N</text>
+      <circle cx="-16" cy="-28" r="7" fill="#ffffff" opacity="0.85" />
+      <circle cx="-24" cy="-18" r="4" fill="#ffffff" opacity="0.65" />
+    </g>
+  </g>
+
+  <!-- 5. TAGLINE RIBBON -->
+  <g id="tagline-ribbon" transform="translate(300, 275)">
+    <path
+      d="M-210 -15 Q0 -25 210 -15 L200 18 Q0 8 -200 18 Z"
+      fill="#0b112c"
+      stroke="#0b112c"
+      stroke-width="6"
+      stroke-linejoin="round"
+    />
+    <text
+      class="brand-bubble font-semibold"
+      font-size="14.5"
+      fill="#ffffff"
+      letter-spacing="2.5"
+      y="1.5"
+    >
+      <tspan fill="#38bdf8">DRAW</tspan>. <tspan fill="#4ade80">GUESS</tspan>. <tspan fill="#facc15">LAUGH</tspan>. <tspan fill="#f472b6">REPEAT</tspan>.
+    </text>
+    <path d="M-240 -12 Q-225 -15 -215 -10" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M-235 -2 Q-220 -5 -215 0" stroke="#4ade80" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M215 -10 Q225 -15 240 -12" stroke="#f472b6" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M215 0 Q220 -5 235 -2" stroke="#facc15" stroke-width="3" stroke-linecap="round" fill="none" />
+  </g>
+</svg>
